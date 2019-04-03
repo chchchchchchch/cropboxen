@@ -46,7 +46,6 @@
      sArea = $('#viewport')
              .imgAreaSelect({handles:true,
                              instance:true,
-                             keys:true,
                              onSelectEnd:function(){calculateCropBox();}
                             });
 
@@ -97,7 +96,7 @@
         }
 
         if ( keyCode == 13 ) {
-
+console.log("PRESS SAVE");
              svgX = Math.round((sArea.getSelection().x1 - zoomX) 
                                 / srcScale / zoomScale);
              svgY = Math.round((sArea.getSelection().y1 - zoomY) 
@@ -140,55 +139,54 @@
   // -> firing-resize-event-only-once-when-resizing-is-finished/
   window.addEventListener('resize',function() { 
                            if ( resizing != true ) {
-                                dumpSelection();
+                                pushSelection();
                                 resizing = true;
                            }
                            clearTimeout(resizeTimeout);
-                           resizeTimeOut = setTimeout(doneResizing(),100);});
+                           resizeTimeOut = setTimeout(doneResizing(),800);});
 // ------------------------------------------------------------------------- //
    })
 // ------------------------------------------------------------------------- //
-   function dumpSelection() {
+   function pushSelection() {
 
-      X = (sArea.getSelection().x1 - zoomX) / srcScale / zoomScale;
-      Y = (sArea.getSelection().y1 - zoomY) / srcScale / zoomScale;
-      W = Math.round(wSrc / zoomScale);H = Math.round(hSrc / zoomScale);
+      W = wSrc/zoomScale;H = hSrc/zoomScale;
+      X = (sArea.getSelection().x1-zoomX)/srcScale/zoomScale;
+      Y = (sArea.getSelection().y1-zoomY)/srcScale/zoomScale;
       cB = document.createElementNS(svgNS,"rect");
       cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
       cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
       cB.setAttributeNS(null,"id","tmp");
-      cB.setAttributeNS(null,"class","croparea");
-    //cB.setAttributeNS(null,"style","display:none");
+    //cB.setAttributeNS(null,"class","croparea");
+      cB.setAttributeNS(null,"style","visibility:hidden");
       document.getElementById("showCropBoxes").appendChild(cB);
 
    }
 // ------------------------------------------------------------------------- //
-   function loadSelection() {
+   function popSelection() {
 
-       sID = document.getElementById('tmp');
+      sID = document.getElementById('tmp');
 
-       svgX = getCoords(sID)[0];
-       svgY = getCoords(sID)[1];
-       svgW = Number($(sID).attr("width"));
-       svgH = Number($(sID).attr("height"));
-       sID.remove();
+      svgX = getCoords(sID)[0];
+      svgY = getCoords(sID)[1];
+      svgW = Number($(sID).attr("width"));
+      svgH = Number($(sID).attr("height"));
+      sID.remove();
 
-       canvasWidth = $('div#svg').width();
-       srcScale = canvasWidth / srcWidth;
+      canvasWidth = $('div#svg').width();
+      srcScale = canvasWidth / srcWidth;
 
-       xS = svgX;yS = svgY;
-       wS = Math.round(svgW * srcScale * zoomScale);
-       hS = Math.round(svgH * srcScale * zoomScale);
+      xS = svgX;yS = svgY;
+      wS = svgW * srcScale * zoomScale;
+      hS = svgH * srcScale * zoomScale;
  
-       sArea.setSelection(xS,yS,xS+wS,yS+hS);
-       sArea.setOptions({show:true,enable:true});
-       sArea.update();
+      sArea.setSelection(xS,yS,xS+wS,yS+hS);
+      sArea.setOptions({show:true,enable:true});
+      sArea.update();
 
    }
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizing = false;
-                            console.log("RESIZE END");
-                            loadSelection();
+                            popSelection();
                             calculateCropBox(); }
 // ------------------------------------------------------------------------- //
    function calculateCropBox() {
@@ -210,9 +208,9 @@
 // ------------------------------------------------------------------------- //
    function editSelection(sID) {
 
-     //svgX = Number($(sID).attr("x"));
+       borderWidth = 10;
+
        svgX = getCoords(sID)[0];
-     //svgY = Number($(sID).attr("y"));
        svgY = getCoords(sID)[1];
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
@@ -221,14 +219,15 @@
        canvasWidth = $('div#svg').width();
        srcScale = canvasWidth / srcWidth;
 
-       xS = svgX;
-       yS = svgY;
+       xS = svgX + (borderWidth/2 * srcScale * zoomScale);
+       yS = svgY + (borderWidth/2 * srcScale * zoomScale);
        wS = Math.round(svgW * srcScale * zoomScale);
        hS = Math.round(svgH * srcScale * zoomScale);
  
        sArea.setSelection(xS,yS,xS+wS,yS+hS);
-       sArea.setOptions({show:true,enable:true});
+       sArea.setOptions({show:true});
        sArea.update();
+       calculateCropBox();
 
    }
 // ------------------------------------------------------------------------- //
@@ -282,21 +281,20 @@
   function getCoords(elem) { // crossbrowser version
 
        var box = elem.getBoundingClientRect();
-   
        var body = document.body;
        var docEl = document.documentElement;
-   
-       var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-       var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-   
+       var scrollTop = window.pageYOffset 
+                       || docEl.scrollTop || body.scrollTop;
+       var scrollLeft = window.pageXOffset 
+                        || docEl.scrollLeft || body.scrollLeft;
        var clientTop = docEl.clientTop || body.clientTop || 0;
-       var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-   
+       var clientLeft = docEl.clientLeft || body.clientLeft || 0; 
        var top  = box.top +  scrollTop - clientTop;
        var left = box.left + scrollLeft - clientLeft;
    
      //return { top: Math.round(top), left: Math.round(left) };
-       return [Math.round(left),Math.round(top)];
+     //return [Math.round(left),Math.round(top)];
+       return [left,top];
    }
 // ------------------------------------------------------------------------- //
  </script>
