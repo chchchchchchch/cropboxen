@@ -12,96 +12,45 @@
  <script src="lib/js/panzoom.js"></script>
  <script>   var srcUrl = "https://github.sfds/adsdsdf/bla.svg"
           var srcWidth = 11916;
-              var srcX = -1646; 
-              var srcY = -1617;
+              var srcX = -1646; // xInit 
+              var srcY = -1617; // yInit
  </script>
  <script>
-  var svgNS = "http://www.w3.org/2000/svg";
-  var panzoomSave;
 
-  var editMode = false;
+   var svgNS = "http://www.w3.org/2000/svg";
+   var panzoomSave;
 
-  var resizeTimeout;
-  var windowWidth = $(window).width();
-  var canvasWidth = $('div#svg').width();
-  var srcScale = canvasWidth / srcWidth;
-  var sArea;
+   var zoomX = 0;
+   var zoomY = 0;
+   var zoomScale = 1;
 
-   $(document).ready(function () {
+   var editMode = false;
 
+   var resizeTimeout;
+   var windowWidth = $(window).width();
+   var canvasWidth = $('div#svg').width();
+   var srcScale = canvasWidth / srcWidth;
+   var sArea;
+// ------------------------------------------------------------------------- //
+   $(document).ready(function(){
+// ------------------------------------------------------------------------- //
      sArea = $('#viewport')
              .imgAreaSelect({handles:true,
                              instance:true,
-                             onSelectEnd:
-                             function(){ /*windowWidth = $(window).width();
-                                         x1 = sArea.getSelection().x1;
-                                         y1 = sArea.getSelection().y1;
-                                         x2 = sArea.getSelection().x2;
-                                         y2 = sArea.getSelection().y2;
+                             onSelectEnd:function(){ recalculateSelection();}
+                            });
 
-                              canvasWidth = $('div#svg').width();
-                              srcScale = canvasWidth / srcWidth;
-
-                              xSrc = Math.round(sArea.getSelection().x1 / srcScale);
-                              ySrc = Math.round(sArea.getSelection().y1 / srcScale);
-                              wSrc = Math.round(sArea.getSelection().width  / srcScale);
-                              hSrc = Math.round(sArea.getSelection().height / srcScale);*/
-
-                              recalculateSelection();
-                              }
-                           });
-
-   });
 // ------------------------------------------------------------------------- //
-   function drawSelection() {
-
-   }
-// ------------------------------------------------------------------------- //
-   function recalculateSelection() {
-
-      windowWidth = $(window).width();
-      x1 = sArea.getSelection().x1;
-      y1 = sArea.getSelection().y1;
-      x2 = sArea.getSelection().x2;
-      y2 = sArea.getSelection().y2;
-
-      canvasWidth = $('div#svg').width();
-      srcScale = canvasWidth / srcWidth;
-
-      xSrc = Math.round(sArea.getSelection().x1 / srcScale);
-      ySrc = Math.round(sArea.getSelection().y1 / srcScale);
-      wSrc = Math.round(sArea.getSelection().width  / srcScale);
-      hSrc = Math.round(sArea.getSelection().height / srcScale);
-
-   }
-// ------------------------------------------------------------------------- //
-   function resizeSelection(sID) {
-      //windowScale = $(window).width() / windowWidth;
-        sID.setSelection(x1 * windowScale,
-                         y1 * windowScale,
-                         x2 * windowScale,
-                         y2 * windowScale);
-        sID.update();
-   }
-// ------------------------------------------------------------------------- //
-   function doneResizing(){ windowScale = $(window).width() / windowWidth;
-                            recalculateSelection();
-                            resizeSelection(sArea); }
-// ------------------------------------------------------------------------- //
-   // https://alvarotrigo.com/blog/firing-resize-event-only-once-when-resizing-is-finished/
-   window.addEventListener('resize', function() {
-       clearTimeout(resizeTimeout);
-       resizeTimeOut = setTimeout(doneResizing(),500);
-   });
-
- </script>
- <script>
-
-   $(document).ready(function(){
-
      var area = panzoom(document.getElementById('svg'));
+     area.on('transform', function(e) {
+
+             zoomX = area.getTransform().x;
+             zoomY = area.getTransform().y;
+             zoomScale = area.getTransform().scale;
+
+     });
      area.pause();
-  // ----------------------------------------------------------------------- //
+// ------------------------------------------------------------------------- //
      window.addEventListener("keydown", function(e) {
       // console.log(e.keyCode);
       // space and arrow keys and return and tab
@@ -109,7 +58,7 @@
           e.preventDefault();
       }
      }, false); 
-  // ----------------------------------------------------------------------- //
+  // -------------------------------------------------------------------- //
      $(window).bind('keydown',function(e) {
 
        keyCode = e.keyCode || e.which;
@@ -140,12 +89,10 @@
 
         if ( keyCode == 13 ) {
 
-             zoomX = area.getTransform().x;
-             zoomY = area.getTransform().y;
-             zoomScale = area.getTransform().scale;
-
-             svgX = Math.round((sArea.getSelection().x1 - zoomX) / srcScale / zoomScale);
-             svgY = Math.round((sArea.getSelection().y1 - zoomY) / srcScale / zoomScale);
+             svgX = Math.round((sArea.getSelection().x1 - zoomX) 
+                                / srcScale / zoomScale);
+             svgY = Math.round((sArea.getSelection().y1 - zoomY) 
+                               / srcScale / zoomScale);
              svgW = Math.round(wSrc / zoomScale);
              svgH = Math.round(hSrc / zoomScale);
 
@@ -154,7 +101,7 @@
 
        }
      })
-  // ----------------------------------------------------------------------- //
+  // -------------------------------------------------------------------- //
      $(window).bind('keyup',function(e) { 
 
                keyCode = e.keyCode || e.which;
@@ -179,22 +126,86 @@
 
                }
      })
+  // -------------------------------------------------------------------- //
+  // https://alvarotrigo.com/blog/
+  // -> firing-resize-event-only-once-when-resizing-is-finished/
+  window.addEventListener('resize',function() { 
+                           clearTimeout(resizeTimeout);
+                           resizeTimeOut = setTimeout(doneResizing(),500);});
+// ------------------------------------------------------------------------- //
    })
 // ------------------------------------------------------------------------- //
-   function rmSelection(sID) { sID.remove(); }
+
+</script>
+<script>
+
+// ------------------------------------------------------------------------- //
+   function doneResizing(){ resizeSelection(sArea);recalculateSelection(); }
+// ------------------------------------------------------------------------- //
+   function recalculateSelection() {
+
+      windowWidth = $(window).width();
+      x1 = sArea.getSelection().x1;
+      y1 = sArea.getSelection().y1;
+      x2 = sArea.getSelection().x2;
+      y2 = sArea.getSelection().y2;
+
+      canvasWidth = $('div#svg').width();
+      srcScale = canvasWidth / srcWidth;
+
+      xSrc = Math.round(sArea.getSelection().x1 / srcScale);
+      ySrc = Math.round(sArea.getSelection().y1 / srcScale);
+      wSrc = Math.round(sArea.getSelection().width  / srcScale);
+      hSrc = Math.round(sArea.getSelection().height / srcScale);
+
+   }
+// ------------------------------------------------------------------------- //
+   function resizeSelection(sArea) {
+        windowScale = $(window).width() / windowWidth;
+
+        sArea.setSelection((x1 * windowScale) * zoomScale,
+                           (y1 * windowScale) * zoomScale,
+                           (x2 * windowScale) * zoomScale,
+                           (y2 * windowScale) * zoomScale);
+        sArea.update();
+   }
+// ------------------------------------------------------------------------- //
+   function rmSelection(sID) { // TODO: post
+                               sID.remove(); }
 // ------------------------------------------------------------------------- //
    function editSelection(sID) {
 
-       x = Number($(sID).attr("x"));
-       y = Number($(sID).attr("y"));
-       w = Number($(sID).attr("width"));
-       h = Number($(sID).attr("height"));
-       sID.remove();
-       sID.setSelection(x * windowScale,
-                        y * windowScale,
-                        x * windowScale,
-                        y * windowScale);
+       svgX = Number($(sID).attr("x"));
+       svgY = Number($(sID).attr("y"));
+       svgW = Number($(sID).attr("width"));
+       svgH = Number($(sID).attr("height"));
+     //sID.remove();
 
+/*
+       sArea.setSelection(Math.round((svgX + zoomX) * srcScale / zoomScale),
+             Math.round((svgY + zoomY) * srcScale / zoomScale),
+             Math.round(svgW * srcScale / zoomScale),
+             Math.round(svgH * srcScale / zoomScale));
+*/
+
+
+           //zoomX = area.getTransform().x;
+           //zoomY = area.getTransform().y;
+           //zoomScale = area.getTransform().scale;
+
+
+console.log(area);
+
+
+
+/*
+       sArea.setSelection(svgX / srcScale,
+                          0,
+                          svgW * srcScale,
+                          svgH * srcScale);
+       sArea.setOptions({show:true});
+       sArea.update();
+*/
 
    }
 // ------------------------------------------------------------------------- //
@@ -208,10 +219,12 @@
       cB.setAttributeNS(null,"height",H);
       cB.setAttributeNS(null,"id",iD);
       cB.setAttributeNS(null,"class","croparea");
-      cB.setAttributeNS(null,"onclick","rmSelection(this)");
-    //cB.setAttributeNS(null,"onclick","editSelection(this)");
+    //cB.setAttributeNS(null,"onclick","rmSelection(this)");
+      cB.setAttributeNS(null,"onclick","editSelection(this)");
       cB.setAttributeNS(null,"onmouseover","showSelection(this)");
       document.getElementById("showCropBoxes").appendChild(cB);
+
+      // TODO: post
 
    }
 // ------------------------------------------------------------------------- //
