@@ -17,28 +17,21 @@
  </script>
  <script>
 
-   var svgNS = "http://www.w3.org/2000/svg";
    var panzoomSave;
+   var panX = 0;var panY = 0;var pzScale = 1;
 
-   var zoomX = 0;
-   var zoomY = 0;
-   var zoomScale = 1;
-
+   var sArea;
    var x1,x2,y1,y2;
-   var offsetX = 0;
-   var offsetY = 0;
-   var offsetScale = 1;
 
    var editMode = false;
+   var svgNS = "http://www.w3.org/2000/svg";
 
-   var resizing = false;
-   var resizeTimeout;
+   var resizing = false;var resizeTimeout;
 
    var windowWidth = $(window).width();
    var canvasWidth = $('div#svg').width();
    var srcScale = canvasWidth / srcWidth;
 
-   var sArea;
 
 // ------------------------------------------------------------------------- //
    $(document).ready(function(){
@@ -50,14 +43,15 @@
                             });
 
 // ------------------------------------------------------------------------- //
-     var area = panzoom(document.getElementById('svg'));
-     area.on('transform', function(e) {
+     var panZoom = panzoom(document.getElementById('svg'));
+     panZoom.on('transform', function(e) {
 
-             zoomScale = area.getTransform().scale;
-             zoomX = area.getTransform().x;zoomY = area.getTransform().y;
+             panX = panZoom.getTransform().x;
+             panY = panZoom.getTransform().y;
+             pzScale = panZoom.getTransform().scale;
 
      });
-     area.pause();
+     panZoom.pause();
 // ------------------------------------------------------------------------- //
      window.addEventListener("keydown", function(e) {
       // console.log(e.keyCode);
@@ -89,22 +83,22 @@
        if ( editMode != true ) {
 
         if ( keyCode == 32 ) {
-         if (  area.isPaused() ) { 
+         if (  panZoom.isPaused() ) { 
                sArea.setOptions({disable:true})
-               area.resume();
+               panZoom.resume();
          }
         }
 
         if ( keyCode == 13 ) {
 
-             svgX = Math.round((sArea.getSelection().x1 - zoomX) 
-                                / srcScale / zoomScale);
-             svgY = Math.round((sArea.getSelection().y1 - zoomY) 
-                               / srcScale / zoomScale);
-             svgW = Math.round(wSrc / zoomScale);
-             svgH = Math.round(hSrc / zoomScale);
+             svgX = Math.round((sArea.getSelection().x1 - panX) 
+                                / srcScale / pzScale);
+             svgY = Math.round((sArea.getSelection().y1 - panY) 
+                               / srcScale / pzScale);
+             svgW = Math.round(wSrc / pzScale);
+             svgH = Math.round(hSrc / pzScale);
 
-             addSelection(svgX,svgY,svgW,svgH);
+             addCropBox(svgX,svgY,svgW,svgH);
          }
 
        }
@@ -116,7 +110,7 @@
 
                if ( keyCode == 32 ) {
 
-                 area.pause();
+                 panZoom.pause();
                  sArea.setOptions({disable:false});
 
                }
@@ -149,9 +143,9 @@
 // ------------------------------------------------------------------------- //
    function pushSelection() {
 
-      W = wSrc/zoomScale;H = hSrc/zoomScale;
-      X = (sArea.getSelection().x1-zoomX)/srcScale/zoomScale;
-      Y = (sArea.getSelection().y1-zoomY)/srcScale/zoomScale;
+      W = wSrc/pzScale;H = hSrc/pzScale;
+      X = (sArea.getSelection().x1-panX)/srcScale/pzScale;
+      Y = (sArea.getSelection().y1-panY)/srcScale/pzScale;
       cB = document.createElementNS(svgNS,"rect");
       cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
       cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
@@ -176,8 +170,8 @@
       srcScale = canvasWidth / srcWidth;
 
       xS = svgX;yS = svgY;
-      wS = svgW * srcScale * zoomScale;
-      hS = svgH * srcScale * zoomScale;
+      wS = svgW * srcScale * pzScale;
+      hS = svgH * srcScale * pzScale;
  
       sArea.setSelection(xS,yS,xS+wS,yS+hS);
       sArea.setOptions({show:true,enable:true});
@@ -206,7 +200,7 @@
 
    }
 // ------------------------------------------------------------------------- //
-   function editSelection(sID) {
+   function editCropBox(sID) {
 
        borderWidth = 10;
 
@@ -219,10 +213,10 @@
        canvasWidth = $('div#svg').width();
        srcScale = canvasWidth / srcWidth;
 
-       xS = svgX + (borderWidth/2 * srcScale * zoomScale);
-       yS = svgY + (borderWidth/2 * srcScale * zoomScale);
-       wS = Math.round(svgW * srcScale * zoomScale);
-       hS = Math.round(svgH * srcScale * zoomScale);
+       xS = svgX + (borderWidth/2 * srcScale * pzScale);
+       yS = svgY + (borderWidth/2 * srcScale * pzScale);
+       wS = Math.round(svgW * srcScale * pzScale);
+       hS = Math.round(svgH * srcScale * pzScale);
  
        sArea.setSelection(xS,yS,xS+wS,yS+hS);
        sArea.setOptions({show:true});
@@ -231,10 +225,10 @@
 
    }
 // ------------------------------------------------------------------------- //
-   function rmSelection(sID) { // TODO: post
+   function rmCropBox(sID) { // TODO: post
                                sID.remove(); }
 // ------------------------------------------------------------------------- //
-   function addSelection(X,Y,W,H) {
+   function addCropBox(X,Y,W,H) {
 
       cB = document.createElementNS(svgNS,"rect");
       iD = $.md5(X + "" + Y + "" + "" + W + "" + ""+  H).substr(0,11);
@@ -244,23 +238,23 @@
       cB.setAttributeNS(null,"height",H);
       cB.setAttributeNS(null,"id",iD);
       cB.setAttributeNS(null,"class","croparea");
-    //cB.setAttributeNS(null,"onclick","rmSelection(this)");
-      cB.setAttributeNS(null,"onclick","editSelection(this)");
-      cB.setAttributeNS(null,"onmouseover","showSelection(this)");
+    //cB.setAttributeNS(null,"onclick","rmCropBox(this)");
+      cB.setAttributeNS(null,"onclick","editCropBox(this)");
+      cB.setAttributeNS(null,"onmouseover","showCropBox(this)");
       document.getElementById("showCropBoxes").appendChild(cB);
 
       // TODO: post
 
    }
 // ------------------------------------------------------------------------- //
-   function showSelection(sID) {
+   function showCropBox(sID) {
 
      x = srcX + Number($(sID).attr("x"));
      y = srcY + Number($(sID).attr("y"));
      w = $(sID).attr("width");
      h = $(sID).attr("height");
      mdshcode = "% SHOW: " + srcUrl + 
-                " --area=" + x + 
+                " --panZoom=" + x + 
                 ":"        + y +
                 ":"        + w +
                 ":"        + h;
