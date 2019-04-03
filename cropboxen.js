@@ -237,10 +237,14 @@
         if ( keyCode == 13 ) {
 
              svgScale = $('div#svg').width() / svgWidth;
-             svgX = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
-             svgY = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
-             svgW = sArea.getSelection().width / svgScale / pzScale;
-             svgH = sArea.getSelection().height / svgScale / pzScale;
+             svgX = Math.round((sArea.getSelection().x1 - panX) 
+                               / svgScale / pzScale);
+             svgY = Math.round((sArea.getSelection().y1 - panY) 
+                               / svgScale / pzScale);
+             svgW = Math.round(sArea.getSelection().width 
+                               / svgScale / pzScale);
+             svgH = Math.round(sArea.getSelection().height 
+                               / svgScale / pzScale);
 
              saveCropBox(svgX,svgY,svgW,svgH);
          }
