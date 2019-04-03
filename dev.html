@@ -46,7 +46,7 @@
              .imgAreaSelect({handles:true,
                              instance:true,
                              keys:true,
-                             onSelectEnd:function(){recalculateSelection();}
+                             onSelectEnd:function(){/*recalculateSelection();*/}
                             });
 
 // ------------------------------------------------------------------------- //
@@ -56,9 +56,6 @@
              zoomX = area.getTransform().x;
              zoomY = area.getTransform().y;
              zoomScale = area.getTransform().scale;
-
-             offsetX = zoomX;
-             offsetScale = zoomScale;
 
      });
      area.pause();
@@ -139,21 +136,19 @@
                }
      })
   // -------------------------------------------------------------------- //
+/*
   // https://alvarotrigo.com/blog/
   // -> firing-resize-event-only-once-when-resizing-is-finished/
   window.addEventListener('resize',function() { 
                            clearTimeout(resizeTimeout);
                            resizeTimeOut = setTimeout(doneResizing(),500);});
+*/
 // ------------------------------------------------------------------------- //
    })
 // ------------------------------------------------------------------------- //
-
-</script>
-<script>
-
+/*
 // ------------------------------------------------------------------------- //
-   function doneResizing(){ resizeSelection(sArea);recalculateSelection();
-                            offsetX=0;offsetScale=1; }
+   function doneResizing(){ resizeSelection(sArea);recalculateSelection(); }
 // ------------------------------------------------------------------------- //
    function recalculateSelection() { // recalculateCropBox (?)
 
@@ -162,9 +157,6 @@
 
       canvasWidth = $('div#svg').width();
       srcScale = canvasWidth / srcWidth;
-
-      offsetX = zoomX;
-      offsetScale = zoomScale;
 
       xSrc = Math.round(sArea.getSelection().x1     / srcScale);
       ySrc = Math.round(sArea.getSelection().y1     / srcScale);
@@ -178,31 +170,13 @@
    function resizeSelection(sArea) {
 
 
-//      windowScale = $(window).width() / windowWidth;
-/*
-        sArea.setSelection(x1 * windowScale,y1 * windowScale,
-                           x2 * windowScale,y2 * windowScale);
-
-*/
-/*
-        sArea.setSelection(x1 * windowScale * displayScale,
-                           y1 * windowScale * displayScale,
-                           x2 * windowScale * displayScale,
-                           y2 * windowScale * displayScale);
-*/
-
-        windowScale = $(window).width() / windowWidth;
-console.log(offsetScale);
-        xS = x1 * windowScale * offsetScale;        // X SELECTION
-        yS = y1 * windowScale;        // X SELECTION
-        wS = (x2 - x1) * windowScale; // WIDTH SELECTION
-        hS = (y2 - y1) * windowScale; // HEIGHT SELECTION
-
-        sArea.setSelection(xS,yS,xS+wS,yS+hS);
-
-        sArea.update();
+      windowScale = $(window).width() / windowWidth;
+      sArea.setSelection(x1 * windowScale,y1 * windowScale,
+                         x2 * windowScale,y2 * windowScale);
+      sArea.update();
 
    }
+*/
 // ------------------------------------------------------------------------- //
    function rmSelection(sID) { // TODO: post
                                sID.remove(); }
