@@ -31,6 +31,7 @@
 
    var editMode = false;
 
+   var resizing = false;
    var resizeTimeout;
 
    var windowWidth = $(window).width();
@@ -46,16 +47,15 @@
              .imgAreaSelect({handles:true,
                              instance:true,
                              keys:true,
-                             onSelectEnd:function(){/*recalculateSelection();*/}
+                             onSelectEnd:function(){calculateCropBox();}
                             });
 
 // ------------------------------------------------------------------------- //
      var area = panzoom(document.getElementById('svg'));
      area.on('transform', function(e) {
 
-             zoomX = area.getTransform().x;
-             zoomY = area.getTransform().y;
              zoomScale = area.getTransform().scale;
+             zoomX = area.getTransform().x;zoomY = area.getTransform().y;
 
      });
      area.pause();
@@ -136,21 +136,62 @@
                }
      })
   // -------------------------------------------------------------------- //
-/*
   // https://alvarotrigo.com/blog/
   // -> firing-resize-event-only-once-when-resizing-is-finished/
   window.addEventListener('resize',function() { 
+                           if ( resizing != true ) {
+                                dumpSelection();
+                                resizing = true;
+                           }
                            clearTimeout(resizeTimeout);
-                           resizeTimeOut = setTimeout(doneResizing(),500);});
-*/
+                           resizeTimeOut = setTimeout(doneResizing(),100);});
 // ------------------------------------------------------------------------- //
    })
 // ------------------------------------------------------------------------- //
-/*
+   function dumpSelection() {
+
+      X = (sArea.getSelection().x1 - zoomX) / srcScale / zoomScale;
+      Y = (sArea.getSelection().y1 - zoomY) / srcScale / zoomScale;
+      W = Math.round(wSrc / zoomScale);H = Math.round(hSrc / zoomScale);
+      cB = document.createElementNS(svgNS,"rect");
+      cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
+      cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
+      cB.setAttributeNS(null,"id","tmp");
+      cB.setAttributeNS(null,"class","croparea");
+    //cB.setAttributeNS(null,"style","display:none");
+      document.getElementById("showCropBoxes").appendChild(cB);
+
+   }
 // ------------------------------------------------------------------------- //
-   function doneResizing(){ resizeSelection(sArea);recalculateSelection(); }
+   function loadSelection() {
+
+       sID = document.getElementById('tmp');
+
+       svgX = getCoords(sID)[0];
+       svgY = getCoords(sID)[1];
+       svgW = Number($(sID).attr("width"));
+       svgH = Number($(sID).attr("height"));
+       sID.remove();
+
+       canvasWidth = $('div#svg').width();
+       srcScale = canvasWidth / srcWidth;
+
+       xS = svgX;yS = svgY;
+       wS = Math.round(svgW * srcScale * zoomScale);
+       hS = Math.round(svgH * srcScale * zoomScale);
+ 
+       sArea.setSelection(xS,yS,xS+wS,yS+hS);
+       sArea.setOptions({show:true,enable:true});
+       sArea.update();
+
+   }
 // ------------------------------------------------------------------------- //
-   function recalculateSelection() { // recalculateCropBox (?)
+   function doneResizing(){ resizing = false;
+                            console.log("RESIZE END");
+                            loadSelection();
+                            calculateCropBox(); }
+// ------------------------------------------------------------------------- //
+   function calculateCropBox() {
 
       x1 = sArea.getSelection().x1;y1 = sArea.getSelection().y1;
       x2 = sArea.getSelection().x2;y2 = sArea.getSelection().y2;
@@ -166,20 +207,6 @@
       windowWidth = $(window).width(); // SAVE WHEN RESIZE IS DONE
 
    }
-// ------------------------------------------------------------------------- //
-   function resizeSelection(sArea) {
-
-
-      windowScale = $(window).width() / windowWidth;
-      sArea.setSelection(x1 * windowScale,y1 * windowScale,
-                         x2 * windowScale,y2 * windowScale);
-      sArea.update();
-
-   }
-*/
-// ------------------------------------------------------------------------- //
-   function rmSelection(sID) { // TODO: post
-                               sID.remove(); }
 // ------------------------------------------------------------------------- //
    function editSelection(sID) {
 
@@ -204,6 +231,9 @@
        sArea.update();
 
    }
+// ------------------------------------------------------------------------- //
+   function rmSelection(sID) { // TODO: post
+                               sID.remove(); }
 // ------------------------------------------------------------------------- //
    function addSelection(X,Y,W,H) {
 
