@@ -35,84 +35,9 @@
    });
    panZoom.pause();
 // ------------------------------------------------------------------------- //
-     window.addEventListener("keydown", function(e) {
-      // console.log(e.keyCode);
-      // space and arrow keys and return and tab
-      if([32,37,38,39,40,13,9].indexOf(e.keyCode) > -1) {
-          e.preventDefault();
-      }
-     }, false); 
-  // -------------------------------------------------------------------- //
-     $(window).bind('keydown',function(e) {
-
-       keyCode = e.keyCode || e.which;
-
-       if ( keyCode == 9 && editMode != true ) {
-
-            editMode = true;
-            pzSave = $('#svg').attr("style"); // SAVE
-         // WORKAROUND: MOVE PANZOOM TRANSFORM 
-         //             TO SUB ELEMENTS (MAKE CLICKABLE)
-            pzMatrix = $('#svg').css("transform"); 
-            $('div.layer').each(function() {
-              $(this).css({ 'transform':pzMatrix});
-            });
-            $('#svg').removeAttr("style");
-            $('#selections').addClass('onTop');
-
-       }
-
-       if ( editMode != true ) {
-
-        if ( keyCode == 32 ) {
-         if (  panZoom.isPaused() ) { 
-               sArea.setOptions({disable:true})
-               panZoom.resume();
-         }
-        }
-
-        if ( keyCode == 13 ) {
-
-             svgScale = $('div#svg').width() / svgWidth;
-             svgX = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
-             svgY = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
-             svgW = sArea.getSelection().width / svgScale / pzScale;
-             svgH = sArea.getSelection().height / svgScale / pzScale;
-
-             saveCropBox(svgX,svgY,svgW,svgH);
-         }
-
-       }
-     })
-  // -------------------------------------------------------------------- //
-     $(window).bind('keyup',function(e) { 
-
-               keyCode = e.keyCode || e.which;
-
-               if ( keyCode == 32 ) {
-
-                 panZoom.pause();
-                 sArea.setOptions({disable:false});
-
-               }
-
-               if ( keyCode == 9 ) {
-
-                 editMode = false;
-              // RESTORE PANZOOM TRANSFORM
-                 $('div.layer').each(function() {
-                    $(this).css({ 'transform':''});
-                 });
-                 $('#svg').attr("style",pzSave);
-                 pzSave = ''; // RESET
-                 $('#selections').removeClass('onTop');
-
-               }
-     })
-  // -------------------------------------------------------------------- //
   // https://alvarotrigo.com/blog/
   // -> firing-resize-event-only-once-when-resizing-is-finished/
-  window.addEventListener('resize',function() { 
+   window.addEventListener('resize',function() { 
                            if ( resizing != true ) {
                                 pushSelection();
                                 resizing = true;
@@ -269,5 +194,88 @@
      //return [Math.round(left),Math.round(top)];
        return [left,top];
    }
-// ----------------------------------------------------------------------- // 
+// ------------------------------------------------------------------------- //
+
+// ========================================================================= //
+// UI
+// ------------------------------------------------------------------------- //
+   $(document).ready(function(){
+// ------------------------------------------------------------------------- //
+     window.addEventListener("keydown", function(e) {
+      // console.log(e.keyCode);
+      // space and arrow keys and return and tab
+      if([32,37,38,39,40,13,9].indexOf(e.keyCode) > -1) {
+          e.preventDefault();
+      }
+     }, false); 
+  // --------------------------------------------------------------------- //
+     $(window).bind('keydown',function(e) {
+
+       keyCode = e.keyCode || e.which;
+
+       if ( keyCode == 9 && editMode != true ) {
+
+            editMode = true;
+            pzSave = $('#svg').attr("style"); // SAVE
+         // WORKAROUND: MOVE PANZOOM TRANSFORM 
+         //             TO SUB ELEMENTS (MAKE CLICKABLE)
+            pzMatrix = $('#svg').css("transform"); 
+            $('div.layer').each(function() {
+              $(this).css({ 'transform':pzMatrix});
+            });
+            $('#svg').removeAttr("style");
+            $('#selections').addClass('onTop');
+
+       }
+
+       if ( editMode != true ) {
+
+        if ( keyCode == 32 ) {
+         if (  panZoom.isPaused() ) { 
+               sArea.setOptions({disable:true})
+               panZoom.resume();
+         }
+        }
+
+        if ( keyCode == 13 ) {
+
+             svgScale = $('div#svg').width() / svgWidth;
+             svgX = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
+             svgY = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
+             svgW = sArea.getSelection().width / svgScale / pzScale;
+             svgH = sArea.getSelection().height / svgScale / pzScale;
+
+             saveCropBox(svgX,svgY,svgW,svgH);
+         }
+
+       }
+     })
+  // --------------------------------------------------------------------- //
+     $(window).bind('keyup',function(e) { 
+
+               keyCode = e.keyCode || e.which;
+
+               if ( keyCode == 32 ) {
+
+                 panZoom.pause();
+                 sArea.setOptions({disable:false});
+
+               }
+
+               if ( keyCode == 9 ) {
+
+                 editMode = false;
+              // RESTORE PANZOOM TRANSFORM
+                 $('div.layer').each(function() {
+                    $(this).css({ 'transform':''});
+                 });
+                 $('#svg').attr("style",pzSave);
+                 pzSave = ''; // RESET
+                 $('#selections').removeClass('onTop');
+
+               }
+     })
+  // --------------------------------------------------------------------- //
+   })
+// ------------------------------------------------------------------------- //
 
