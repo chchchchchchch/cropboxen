@@ -1,8 +1,165 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="UTF-8">
+
  <link rel="stylesheet" href="lib/css/svg.css">
+ <link rel="stylesheet" href="lib/css/imgareaselect-animated.css">
+ <link rel="stylesheet" href="lib/css/imgareaselect-default.css">
+
  <script src="lib/js/jquery-3.3.1.js"></script>
+ <script src="lib/js/jquery.imgareaselect.js"></script>
+ <script>
+
+  var srcWidth = 11916;
+  var svgNS = "http://www.w3.org/2000/svg";
+  var panzoomSave;
+
+  var editMode = false;
+
+  var resizeTimeout;
+  var windowWidth = $(window).width();
+  var canvasWidth = $('div#svg').width();
+  var srcScale = canvasWidth / srcWidth;
+  var sArea;
+
+  $(document).ready(function () {
+
+     sArea = $('#viewport')
+             .imgAreaSelect({handles:true,
+                             instance:true,
+                             onSelectEnd:
+                             function(){ windowWidth = $(window).width();
+                                         x1 = sArea.getSelection().x1;
+                                         y1 = sArea.getSelection().y1;
+                                         x2 = sArea.getSelection().x2;
+                                         y2 = sArea.getSelection().y2;
+
+                              canvasWidth = $('div#svg').width();
+                              srcScale = canvasWidth / srcWidth;
+
+                              xSrc = Math.round(sArea.getSelection().x1 / srcScale);
+                              ySrc = Math.round(sArea.getSelection().y1 / srcScale);
+                              wSrc = Math.round(sArea.getSelection().width  / srcScale);
+                              hSrc = Math.round(sArea.getSelection().height / srcScale);
+
+                                      }
+                           });
+
+  });
+
+  function resizeSelection(sID) {
+       windowScale = $(window).width() / windowWidth;
+       sID.setSelection(x1 * windowScale,
+                        y1 * windowScale,
+                        x2 * windowScale,
+                        y2 * windowScale);
+       sID.update();
+  }
+
+  // https://alvarotrigo.com/blog/firing-resize-event-only-once-when-resizing-is-finished/
+  window.addEventListener('resize', function() {
+      clearTimeout(resizeTimeout);
+      resizeTimeOut = setTimeout(doneResizing(),500);
+  });
+  function doneResizing(){ resizeSelection(sArea); }
+
+ </script>
+ <script src="lib/js/panzoom.js"></script>
+ <script>
+
+   $(document).ready(function(){
+
+     var area = panzoom(document.getElementById('svg'));
+     area.pause();
+
+     window.addEventListener("keydown", function(e) {
+      // console.log(e.keyCode);
+      // space and arrow keys and return and tab
+      if([32,37,38,39,40,13,9].indexOf(e.keyCode) > -1) {
+          e.preventDefault();
+      }
+     }, false);
+ 
+     $(window).bind('keydown',function(e) {
+
+       keyCode = e.keyCode || e.which;
+
+       if ( keyCode == 9 && editMode != true ) {
+
+            editMode = true;
+          //setTimeout(function(){
+             panzoomSave = $('#svg').attr("style");
+          //},50); // IT MAY BE ONLY 10 MILLISECONDS, IT'S ENOUGH
+            $('#svg').removeAttr("style");
+            $('#selections').addClass('onTop');
+       }
+
+       if ( editMode != true ) {
+
+        if ( keyCode == 32 ) {
+         if (  area.isPaused() ) { 
+               sArea.setOptions({disable:true})
+               area.resume();
+         }
+        }
+
+        if ( keyCode == 13 ) {
+
+             zoomX = area.getTransform().x;
+             zoomY = area.getTransform().y;
+             zoomScale = area.getTransform().scale;
+
+             svgX = (sArea.getSelection().x1 - zoomX) / srcScale / zoomScale;
+             svgY = (sArea.getSelection().y1 - zoomY) / srcScale / zoomScale;
+             svgW = wSrc / zoomScale;
+             svgH = hSrc / zoomScale;
+
+             addSelection(svgX,svgY,svgW,svgH);
+         }
+
+       }
+     })
+
+     $(window).bind('keyup',function(e) { 
+
+               keyCode = e.keyCode || e.which;
+
+               if ( keyCode == 32 ) {
+
+                 area.pause();
+                 sArea.setOptions({disable:false});
+               }
+
+               if ( keyCode == 9 ) {
+
+                 editMode = false;
+                 $('#svg').attr("style",panzoomSave);
+               //setTimeout(function(){
+                  panzoomSave = '';
+               //},10); // IT MAY BE ONLY 10 MILLISECONDS, IT'S ENOUGH
+                 $('#selections').removeClass('onTop');
+
+               }
+     })
+   })
+
+// ------------------------------------------------------------------------- //
+   function rmSelection(selection) { selection.remove(); }
+// ------------------------------------------------------------------------- //
+   function addSelection(X,Y,W,H) {
+
+      cB = document.createElementNS(svgNS,"rect");
+      cB.setAttributeNS(null,"x",X);
+      cB.setAttributeNS(null,"y",Y);
+      cB.setAttributeNS(null,"class","croparea");
+      cB.setAttributeNS(null,"width",W);
+      cB.setAttributeNS(null,"height",H);
+      cB.setAttributeNS(null,"onclick","rmSelection(this)");
+      document.getElementById("showCropBoxes").appendChild(cB);
+
+   }
+// ------------------------------------------------------------------------- //
+ </script>
  <script>
    $(document).ready(function() {
      $('.layerSwitch').click(function() {
@@ -23,6 +180,7 @@
 // ------------------------------------------------------------------------- //
 
  </script>
+
 </head>
 <body>
 
@@ -53,6 +211,7 @@
 <input type="checkbox" id="f27510" class="layerSwitch" checked="checked">fdsfs <br>
 <input type="checkbox" id="947d72" class="layerSwitch" checked="checked">fdsfs <br>
 </div>
+
 
 </body>
 </html>
