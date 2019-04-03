@@ -10,12 +10,14 @@
 
    var svgScale;
    var windowWidth;
+   var vLList;var vLCount;
 
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
    windowWidth = $(window).width();
    svgScale = $('div#svg').width() / svgWidth;
+   visibleLayers(); // INIT
 // ------------------------------------------------------------------------- //
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
@@ -55,6 +57,8 @@
              $(this).hide();
           });   
        }
+
+       visibleLayers();
      });
 // ------------------------------------------------------------------------- //
    })
@@ -162,19 +166,36 @@
      y = Math.round(zeroY + Number($(sID).attr("y")));
      w = Math.round($(sID).attr("width"));
      h = Math.round($(sID).attr("height"));
-     mdshcode = "% SHOW: " + svgUrl + 
-                " --area=" + x + 
-                ":"        + y +
-                ":"        + w +
-                ":"        + h;
+
+     if ( vLCount < Object.keys(svgLayers).length ) { 
+          layers = " --layers=" + vLList;
+     } else { layers = ""; }
+
+     if ( vLCount == 0 ) { mdshcode = "NOTHING TO SEE!"
+     } else { mdshcode = "% SHOW: " + svgUrl + 
+                         " --area=" + x + 
+                         ":"        + y +
+                         ":"        + w +
+                         ":"        + h +
+                         layers;
+     } 
+   
      $('#showmdsh').val(mdshcode);
 
    }
 // ------------------------------------------------------------------------- //   
-   function visibleLayers() {
+   function visibleLayers() { // https://stackoverflow.com/questions/1965075
 
-
-
+     vLList = "";vLCount = 0
+     $('div#layercontrol > input[type=checkbox]').each(function () {
+         liD = $(this).attr('id');
+         lName = svgLayers[liD];
+         var lThisVal = (this.checked ? lName : "");
+         if ( lThisVal != "" ) {
+         vLList += (vLList=="" ? lThisVal : "," + lThisVal);
+         vLCount++;
+         }
+      });
 
    }
 // ------------------------------------------------------------------------- //
