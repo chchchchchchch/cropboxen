@@ -12,8 +12,8 @@
  <script src="lib/js/panzoom.js"></script>
  <script>   var svgUrl = "https://github.sfds/adsdsdf/bla.svg"
           var svgWidth = 11916;
-             var zeroX = -1646; // xInit 
-             var zeroY = -1617; // yInit
+             var zeroX = -1646; 
+             var zeroY = -1617;
  </script>
  <script>
 
@@ -28,22 +28,19 @@
 
    var resizing = false;var resizeTimeout;
 
- //var windowWidth = $(window).width();
- //var canvasWidth = $('div#svg').width();
- //var svgScale = $('div#svg').width() / svgWidth;
    var svgScale;
+   var windowWidth;
 
 // ------------------------------------------------------------------------- //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
-   var windowWidth = $(window).width();
-   var svgScale = $('div#svg').width() / svgWidth;
-   console.log(svgScale);
+   windowWidth = $(window).width();
+   svgScale = $('div#svg').width() / svgWidth;
 // ------------------------------------------------------------------------- //
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
                            instance:true,
-                           onSelectEnd:function(){/*calculateCropBox();*/}
+                           onSelectEnd:function(){/**/}
                           });
 
 // ------------------------------------------------------------------------- //
@@ -98,12 +95,6 @@
              svgScale = $('div#svg').width() / svgWidth;
              svgX = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
              svgY = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
-           //svgW =  wSrc / pzScale;
-           //svgH =  hSrc / pzScale;
-           //svgW = ((sArea.getSelection().x2 - panX) / svgScale / pzScale)
-           //      - ((sArea.getSelection().x1 - panX) / svgScale / pzScale);
-           //svgH = ((sArea.getSelection().y2 - panY) / svgScale / pzScale)
-           //      - ((sArea.getSelection().y1 - panY) / svgScale / pzScale);
              svgW = sArea.getSelection().width / svgScale / pzScale;
              svgH = sArea.getSelection().height / svgScale / pzScale;
 
@@ -152,25 +143,15 @@
 // ------------------------------------------------------------------------- //
    function pushSelection() {
 
-console.log("pushSelection svgScale:" + svgScale);
-
-    //W = wSrc/pzScale;H = hSrc/pzScale;
-    //svgScale = $('div#svg').width() / svgWidth;
-      X = (sArea.getSelection().x1-panX)/svgScale/pzScale;
-      Y = (sArea.getSelection().y1-panY)/svgScale/pzScale;
-/*    W = ((sArea.getSelection().x2-panX)/svgScale/pzScale);
-         - ((sArea.getSelection().x1-panX)/svgScale/pzScale);
-      H = ((sArea.getSelection().y2-panY)/svgScale/pzScale);
-         - ((sArea.getSelection().y1-panY)/svgScale/pzScale);
-*/
       W = sArea.getSelection().width  / svgScale / pzScale;
       H = sArea.getSelection().height / svgScale / pzScale;
+      X = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
+      Y = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
 
       cB = document.createElementNS(svgNS,"rect");
       cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
       cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
       cB.setAttributeNS(null,"id","tmp");
-    //cB.setAttributeNS(null,"class","croparea");
       cB.setAttributeNS(null,"style","visibility:hidden");
       document.getElementById("showCropBoxes").appendChild(cB);
 
@@ -192,34 +173,17 @@ console.log("pushSelection svgScale:" + svgScale);
       x = svgX;y = svgY;
       w = svgW * svgScale * pzScale;
       h = svgH * svgScale * pzScale;
- 
+
       sArea.setSelection(x,y,x+w,y+h);
-      sArea.setOptions({show:true,enable:true});
+      sArea.setOptions({show:true});
       sArea.update();
 
    }
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizing = false;
                             popSelection();
-                          /*calculateCropBox();*/ 
-                            windowWidth = $(window).width(); }
-// ------------------------------------------------------------------------- //
-/* function calculateCropBox() {
-
-      x1 = sArea.getSelection().x1;y1 = sArea.getSelection().y1;
-      x2 = sArea.getSelection().x2;y2 = sArea.getSelection().y2;
-
-      canvasWidth = $('div#svg').width();
-      svgScale = canvasWidth / svgWidth;
-      
-      xSrc = Math.round(sArea.getSelection().x1     / svgScale);
-      ySrc = Math.round(sArea.getSelection().y1     / svgScale);
-      wSrc = Math.round(sArea.getSelection().width  / svgScale);
-      hSrc = Math.round(sArea.getSelection().height / svgScale);
-
-      windowWidth = $(window).width(); // SAVE WHEN RESIZE IS DONE
-
-   } */
+                            windowWidth = $(window).width();
+                            svgScale = $('div#svg').width() / svgWidth; }
 // ------------------------------------------------------------------------- //
    function editCropBox(sID) {
 
@@ -242,7 +206,6 @@ console.log("pushSelection svgScale:" + svgScale);
        sArea.setSelection(x,y,x+w,y+h);
        sArea.setOptions({show:true});
        sArea.update();
-     //calculateCropBox();
 
    }
 // ------------------------------------------------------------------------- //
