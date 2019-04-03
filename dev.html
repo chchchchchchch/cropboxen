@@ -10,14 +10,14 @@
  <script src="lib/js/jquery.imgareaselect.js"></script>
  <script src="lib/js/jquery.md5.js"></script>
  <script src="lib/js/panzoom.js"></script>
- <script>   var srcUrl = "https://github.sfds/adsdsdf/bla.svg"
-          var srcWidth = 11916;
-              var srcX = -1646; // xInit 
-              var srcY = -1617; // yInit
+ <script>   var svgUrl = "https://github.sfds/adsdsdf/bla.svg"
+          var svgWidth = 11916;
+             var zeroX = -1646; // xInit 
+             var zeroY = -1617; // yInit
  </script>
  <script>
 
-   var panzoomSave;
+   var pzSave;
    var panX = 0;var panY = 0;var pzScale = 1;
 
    var sArea;
@@ -30,7 +30,7 @@
 
    var windowWidth = $(window).width();
    var canvasWidth = $('div#svg').width();
-   var srcScale = canvasWidth / srcWidth;
+   var svgScale = canvasWidth / svgWidth;
 
 
 // ------------------------------------------------------------------------- //
@@ -39,7 +39,7 @@
      sArea = $('#viewport')
              .imgAreaSelect({handles:true,
                              instance:true,
-                             onSelectEnd:function(){calculateCropBox();}
+                             onSelectEnd:function(){ calculateCropBox(); }
                             });
 
 // ------------------------------------------------------------------------- //
@@ -68,12 +68,12 @@
        if ( keyCode == 9 && editMode != true ) {
 
             editMode = true;
-            panzoomSave = $('#svg').attr("style"); // SAVE
+            pzSave = $('#svg').attr("style"); // SAVE
          // WORKAROUND: MOVE PANZOOM TRANSFORM 
          //             TO SUB ELEMENTS (MAKE CLICKABLE)
-            pzmatrix = $('#svg').css("transform"); 
+            pzMatrix = $('#svg').css("transform"); 
             $('div.layer').each(function() {
-               $(this).css({ 'transform':pzmatrix});
+              $(this).css({ 'transform':pzMatrix});
             });
             $('#svg').removeAttr("style");
             $('#selections').addClass('onTop');
@@ -92,9 +92,9 @@
         if ( keyCode == 13 ) {
 
              svgX = Math.round((sArea.getSelection().x1 - panX) 
-                                / srcScale / pzScale);
+                                / svgScale / pzScale);
              svgY = Math.round((sArea.getSelection().y1 - panY) 
-                               / srcScale / pzScale);
+                               / svgScale / pzScale);
              svgW = Math.round(wSrc / pzScale);
              svgH = Math.round(hSrc / pzScale);
 
@@ -122,8 +122,8 @@
                  $('div.layer').each(function() {
                     $(this).css({ 'transform':''});
                  });
-                 $('#svg').attr("style",panzoomSave);
-                 panzoomSave = ''; // RESET
+                 $('#svg').attr("style",pzSave);
+                 pzSave = ''; // RESET
                  $('#selections').removeClass('onTop');
 
                }
@@ -144,8 +144,8 @@
    function pushSelection() {
 
       W = wSrc/pzScale;H = hSrc/pzScale;
-      X = (sArea.getSelection().x1-panX)/srcScale/pzScale;
-      Y = (sArea.getSelection().y1-panY)/srcScale/pzScale;
+      X = (sArea.getSelection().x1-panX)/svgScale/pzScale;
+      Y = (sArea.getSelection().y1-panY)/svgScale/pzScale;
       cB = document.createElementNS(svgNS,"rect");
       cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
       cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
@@ -167,13 +167,13 @@
       sID.remove();
 
       canvasWidth = $('div#svg').width();
-      srcScale = canvasWidth / srcWidth;
+      svgScale = canvasWidth / svgWidth;
 
-      xS = svgX;yS = svgY;
-      wS = svgW * srcScale * pzScale;
-      hS = svgH * srcScale * pzScale;
+      x = svgX;y = svgY;
+      w = svgW * svgScale * pzScale;
+      h = svgH * svgScale * pzScale;
  
-      sArea.setSelection(xS,yS,xS+wS,yS+hS);
+      sArea.setSelection(x,y,x+w,y+h);
       sArea.setOptions({show:true,enable:true});
       sArea.update();
 
@@ -189,12 +189,12 @@
       x2 = sArea.getSelection().x2;y2 = sArea.getSelection().y2;
 
       canvasWidth = $('div#svg').width();
-      srcScale = canvasWidth / srcWidth;
+      svgScale = canvasWidth / svgWidth;
 
-      xSrc = Math.round(sArea.getSelection().x1     / srcScale);
-      ySrc = Math.round(sArea.getSelection().y1     / srcScale);
-      wSrc = Math.round(sArea.getSelection().width  / srcScale);
-      hSrc = Math.round(sArea.getSelection().height / srcScale);
+      xSrc = Math.round(sArea.getSelection().x1     / svgScale);
+      ySrc = Math.round(sArea.getSelection().y1     / svgScale);
+      wSrc = Math.round(sArea.getSelection().width  / svgScale);
+      hSrc = Math.round(sArea.getSelection().height / svgScale);
 
       windowWidth = $(window).width(); // SAVE WHEN RESIZE IS DONE
 
@@ -211,14 +211,14 @@
        sID.remove();
 
        canvasWidth = $('div#svg').width();
-       srcScale = canvasWidth / srcWidth;
+       svgScale = canvasWidth / svgWidth;
 
-       xS = svgX + (borderWidth/2 * srcScale * pzScale);
-       yS = svgY + (borderWidth/2 * srcScale * pzScale);
-       wS = Math.round(svgW * srcScale * pzScale);
-       hS = Math.round(svgH * srcScale * pzScale);
+       x = svgX + (borderWidth/2 * svgScale * pzScale);
+       y = svgY + (borderWidth/2 * svgScale * pzScale);
+       w = Math.round(svgW * svgScale * pzScale);
+       h = Math.round(svgH * svgScale * pzScale);
  
-       sArea.setSelection(xS,yS,xS+wS,yS+hS);
+       sArea.setSelection(x,y,x+w,y+h);
        sArea.setOptions({show:true});
        sArea.update();
        calculateCropBox();
@@ -249,11 +249,11 @@
 // ------------------------------------------------------------------------- //
    function showCropBox(sID) {
 
-     x = srcX + Number($(sID).attr("x"));
-     y = srcY + Number($(sID).attr("y"));
+     x = zeroX + Number($(sID).attr("x"));
+     y = zeroY + Number($(sID).attr("y"));
      w = $(sID).attr("width");
      h = $(sID).attr("height");
-     mdshcode = "% SHOW: " + srcUrl + 
+     mdshcode = "% SHOW: " + svgUrl + 
                 " --panZoom=" + x + 
                 ":"        + y +
                 ":"        + w +
