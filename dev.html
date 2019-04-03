@@ -8,6 +8,8 @@
 
  <script src="lib/js/jquery-3.3.1.js"></script>
  <script src="lib/js/jquery.imgareaselect.js"></script>
+ <script src="lib/js/jquery.md5.js"></script>
+ <script src="lib/js/panzoom.js"></script>
  <script>
 
   var srcWidth = 11916;
@@ -64,7 +66,6 @@
   function doneResizing(){ resizeSelection(sArea); }
 
  </script>
- <script src="lib/js/panzoom.js"></script>
  <script>
 
    $(document).ready(function(){
@@ -87,11 +88,16 @@
        if ( keyCode == 9 && editMode != true ) {
 
             editMode = true;
-          //setTimeout(function(){
-             panzoomSave = $('#svg').attr("style");
-          //},50); // IT MAY BE ONLY 10 MILLISECONDS, IT'S ENOUGH
+            panzoomSave = $('#svg').attr("style"); // SAVE
+         // WORKAROUND: MOVE PANZOOM TRANSFORM 
+         //             TO SUB ELEMENTS (MAKE CLICKABLE)
+            pzmatrix = $('#svg').css("transform"); 
+            $('div.layer').each(function() {
+               $(this).css({ 'transform':pzmatrix});
+            });
             $('#svg').removeAttr("style");
             $('#selections').addClass('onTop');
+
        }
 
        if ( editMode != true ) {
@@ -116,8 +122,8 @@
 
              addSelection(svgX,svgY,svgW,svgH);
          }
-
        }
+
      })
 
      $(window).bind('keyup',function(e) { 
@@ -128,18 +134,22 @@
 
                  area.pause();
                  sArea.setOptions({disable:false});
+
                }
 
                if ( keyCode == 9 ) {
 
                  editMode = false;
+              // RESTORE PANZOOM TRANSFORM
+                 $('div.layer').each(function() {
+                    $(this).css({ 'transform':''});
+                 });
                  $('#svg').attr("style",panzoomSave);
-               //setTimeout(function(){
-                  panzoomSave = '';
-               //},10); // IT MAY BE ONLY 10 MILLISECONDS, IT'S ENOUGH
+                 panzoomSave = ''; // RESET
                  $('#selections').removeClass('onTop');
 
                }
+
      })
    })
 
@@ -149,18 +159,29 @@
    function addSelection(X,Y,W,H) {
 
       cB = document.createElementNS(svgNS,"rect");
+      iD = $.md5(X + "" + Y + "" + "" + W + "" + ""+  H).substr(0,11);
       cB.setAttributeNS(null,"x",X);
       cB.setAttributeNS(null,"y",Y);
-      cB.setAttributeNS(null,"class","croparea");
       cB.setAttributeNS(null,"width",W);
       cB.setAttributeNS(null,"height",H);
+      cB.setAttributeNS(null,"id",iD);
+      cB.setAttributeNS(null,"class","croparea");
       cB.setAttributeNS(null,"onclick","rmSelection(this)");
+      cB.setAttributeNS(null,"onmouseover","showSelection(this)");
       document.getElementById("showCropBoxes").appendChild(cB);
 
    }
 // ------------------------------------------------------------------------- //
+   function showSelection(selection) {
+
+     console.log($(selection).attr("id"));
+
+   }
+// ------------------------------------------------------------------------- //   
  </script>
+
  <script>
+// ------------------------------------------------------------------------- //   
    $(document).ready(function() {
      $('.layerSwitch').click(function() {
        layerName = $(this).attr('id');
@@ -176,10 +197,8 @@
      });
    });
 // ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
-
  </script>
+
 
 </head>
 <body>
