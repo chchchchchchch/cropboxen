@@ -11,6 +11,8 @@
    var svgScale;
    var windowWidth;
    var vLList;var vLCount;
+   var cBList = [];
+   var pendingRm = ""; // WAIT HERE BEFORE BEING REMOVED
 
 // ========================================================================= //
    $(document).ready(function(){
@@ -22,7 +24,9 @@
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
                            instance:true,
-                           onSelectEnd:function(){ selection = true; }
+                           onSelectEnd:function(){ selection = true; 
+                                                   rmCropBox(pendingRm);
+                                                   pendingRm = ""; }
                           });
 
 // ------------------------------------------------------------------------- //
@@ -116,12 +120,18 @@
 // ------------------------------------------------------------------------- //
    function editCropBox(sID) {
 
+       iD = $(sID).attr('id');
        borderWidth = 10;
 
        svgX = getCoords(sID)[0];
        svgY = getCoords(sID)[1];
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
+
+    // RM FROM UI BUT DELETE ONLY IF SELECTION CHANGES
+       pendingRm = sID;
+       i = cBList.indexOf(iD);
+       if (i != -1) { cBList.splice(i,1); }
        sID.remove();
 
        canvasWidth = $('div#svg').width();
@@ -138,26 +148,78 @@
 
    }
 // ------------------------------------------------------------------------- //
-   function rmCropBox(sID) { // TODO: post
-                               sID.remove(); }
+   function rmCropBox(sID) { 
+ 
+      if ( sID != "" ) {
+
+        iD = $(sID).attr('id');
+  
+        // TODO: post
+        timestamp = $.now();
+        saveThis = "D:" +
+                    timestamp + ":" +
+                    iD;
+  
+        i = cBList.indexOf(iD);
+        if (i != -1) { cBList.splice(i,1); }
+        $(sID).remove(); 
+  
+        console.log(saveThis); // DEV //////////////////////////////////////
+
+      } // else { console.log("NOTHING TO DO"); }
+
+   }
+// ------------------------------------------------------------------------- //
+   function drawCropBox(X,Y,W,H) {
+
+      iD = $.md5(X+""+Y+""+""+W+""+""+H).substr(0,11);
+      checkCBList = $.grep(cBList,function(e){
+                      return e.match(iD);}).length;
+
+      if ( checkCBList <= 0 ) {
+
+        cB = document.createElementNS(svgNS,"rect");
+        cB.setAttributeNS(null,"x",X);
+        cB.setAttributeNS(null,"y",Y);
+        cB.setAttributeNS(null,"width",W);
+        cB.setAttributeNS(null,"height",H);
+        cB.setAttributeNS(null,"id",iD);
+        cB.setAttributeNS(null,"class","croparea");
+        cB.setAttributeNS(null,"onclick","editCropBox(this)");
+        cB.setAttributeNS(null,"onmouseover","showCropBox(this)");
+        document.getElementById("showCropBoxes").appendChild(cB);
+
+      }
+
+      pendingRm = ""; // RESET (=> DO NOT DELETE)
+
+   }
 // ------------------------------------------------------------------------- //
    function saveCropBox(X,Y,W,H) {
 
-      cB = document.createElementNS(svgNS,"rect");
-      iD = $.md5(X + "" + Y + "" + "" + W + "" + ""+  H).substr(0,11);
-      cB.setAttributeNS(null,"x",X);
-      cB.setAttributeNS(null,"y",Y);
-      cB.setAttributeNS(null,"width",W);
-      cB.setAttributeNS(null,"height",H);
-      cB.setAttributeNS(null,"id",iD);
-      cB.setAttributeNS(null,"class","croparea");
-    //cB.setAttributeNS(null,"onclick","rmCropBox(this)");
-      cB.setAttributeNS(null,"onclick","editCropBox(this)");
-      cB.setAttributeNS(null,"onmouseover","showCropBox(this)");
-      document.getElementById("showCropBoxes").appendChild(cB);
+      iD = $.md5(X+""+Y+""+""+W+""+""+H).substr(0,11);
+      checkCBList = $.grep(cBList,function(e){
+                      return e.match(iD);}).length;
 
-      // TODO: post
+      if ( checkCBList <= 0 ) {
+  
+        drawCropBox(X,Y,W,H);
 
+        // TODO: post
+        timestamp = $.now();
+        saveThis = "A:" +
+                    timestamp + ":" +
+                    iD + ":" +
+                    X + ":" +
+                    Y + ":" +
+                    W + ":" +
+                    H;
+  
+        cBList.push(iD);
+
+        console.log(saveThis); // DEV /////////////////////////////////////
+
+       }
    }
 // ------------------------------------------------------------------------- //
    function showCropBox(sID) {
@@ -279,9 +341,16 @@
              svgH = Math.round(sArea.getSelection().height 
                                / svgScale / pzScale);
 
-             saveCropBox(svgX,svgY,svgW,svgH);
-         }
+             if ( pendingRm != "" ) {
 
+                 drawCropBox(svgX,svgY,svgW,svgH);
+
+             } else {
+
+                 saveCropBox(svgX,svgY,svgW,svgH);
+
+             }
+         }
        }
      })
   // --------------------------------------------------------------------- //
