@@ -40,6 +40,12 @@
    });
    panZoom.pause();
 // ------------------------------------------------------------------------- //
+   $('svg#showCropBoxes > rect').each(function () {
+
+      cBList.push($(this).attr('id'));
+
+   });
+// ------------------------------------------------------------------------- //
   // https://alvarotrigo.com/blog/
   // -> firing-resize-event-only-once-when-resizing-is-finished/
    window.addEventListener('resize',function() { 
