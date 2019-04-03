@@ -86,11 +86,11 @@
            Y = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
      
            cB = document.createElementNS(svgNS,"rect");
+           cB.setAttributeNS(null,"id","tmp");
            cB.setAttributeNS(null,"x",X)
            cB.setAttributeNS(null,"y",Y);
            cB.setAttributeNS(null,"width",W)
            cB.setAttributeNS(null,"height",H);
-           cB.setAttributeNS(null,"id","tmp");
            cB.setAttributeNS(null,"style","visibility:hidden");
            document.getElementById("showCropBoxes").appendChild(cB);
 
@@ -190,11 +190,11 @@
       if ( checkCBList <= 0 ) {
 
         cB = document.createElementNS(svgNS,"rect");
+        cB.setAttributeNS(null,"id",iD);
         cB.setAttributeNS(null,"x",X);
         cB.setAttributeNS(null,"y",Y);
         cB.setAttributeNS(null,"width",W);
         cB.setAttributeNS(null,"height",H);
-        cB.setAttributeNS(null,"id",iD);
         cB.setAttributeNS(null,"class","croparea");
         cB.setAttributeNS(null,"onclick","editCropBox(this)");
         cB.setAttributeNS(null,"onmouseover","showCropBox(this)");
