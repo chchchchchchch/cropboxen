@@ -31,7 +31,7 @@
    var svgScale;
    var windowWidth;
 
-// ------------------------------------------------------------------------- //
+// ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
    windowWidth = $(window).width();
@@ -98,7 +98,7 @@
              svgW = sArea.getSelection().width / svgScale / pzScale;
              svgH = sArea.getSelection().height / svgScale / pzScale;
 
-             addCropBox(svgX,svgY,svgW,svgH);
+             saveCropBox(svgX,svgY,svgW,svgH);
          }
 
        }
@@ -139,7 +139,21 @@
                            clearTimeout(resizeTimeout);
                            resizeTimeOut = setTimeout(doneResizing(),800);});
 // ------------------------------------------------------------------------- //
+   $('.layerSwitch').click(function() {
+       layerName = $(this).attr('id');
+       if( $(this).is(':checked')) {
+          $('#svg > div.layer.' + layerName).each(function() {
+             $(this).show();
+          });
+       } else {
+          $('#svg > div.layer.' + layerName).each(function() {
+             $(this).hide();
+          });   
+       }
+     });
+// ------------------------------------------------------------------------- //
    })
+// ========================================================================= //
 // ------------------------------------------------------------------------- //
    function pushSelection() {
 
@@ -212,7 +226,7 @@
    function rmCropBox(sID) { // TODO: post
                                sID.remove(); }
 // ------------------------------------------------------------------------- //
-   function addCropBox(X,Y,W,H) {
+   function saveCropBox(X,Y,W,H) {
 
       cB = document.createElementNS(svgNS,"rect");
       iD = $.md5(X + "" + Y + "" + "" + W + "" + ""+  H).substr(0,11);
@@ -279,19 +293,7 @@
  <script>
 // ------------------------------------------------------------------------- //   
    $(document).ready(function() {
-     $('.layerSwitch').click(function() {
-       layerName = $(this).attr('id');
-       if( $(this).is(':checked')) {
-          $('#svg > div.layer.' + layerName).each(function() {
-             $(this).show();
-          });
-       } else {
-          $('#svg > div.layer.' + layerName).each(function() {
-             $(this).hide();
-          });   
-       }
-     });
-   });
+    });
 // ------------------------------------------------------------------------- //
  </script>
 
