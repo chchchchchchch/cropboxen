@@ -28,30 +28,34 @@
 
    var resizing = false;var resizeTimeout;
 
-   var windowWidth = $(window).width();
-   var canvasWidth = $('div#svg').width();
-   var svgScale = canvasWidth / svgWidth;
-
+ //var windowWidth = $(window).width();
+ //var canvasWidth = $('div#svg').width();
+ //var svgScale = $('div#svg').width() / svgWidth;
+   var svgScale;
 
 // ------------------------------------------------------------------------- //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
-     sArea = $('#viewport')
-             .imgAreaSelect({handles:true,
-                             instance:true,
-                             onSelectEnd:function(){ calculateCropBox(); }
-                            });
+   var windowWidth = $(window).width();
+   var svgScale = $('div#svg').width() / svgWidth;
+   console.log(svgScale);
+// ------------------------------------------------------------------------- //
+   sArea = $('#viewport')
+           .imgAreaSelect({handles:true,
+                           instance:true,
+                           onSelectEnd:function(){/*calculateCropBox();*/}
+                          });
 
 // ------------------------------------------------------------------------- //
-     var panZoom = panzoom(document.getElementById('svg'));
-     panZoom.on('transform', function(e) {
+   var panZoom = panzoom(document.getElementById('svg'));
+   panZoom.on('transform', function(e) {
 
-             panX = panZoom.getTransform().x;
-             panY = panZoom.getTransform().y;
-             pzScale = panZoom.getTransform().scale;
+           panX = panZoom.getTransform().x;
+           panY = panZoom.getTransform().y;
+           pzScale = panZoom.getTransform().scale;
 
-     });
-     panZoom.pause();
+   });
+   panZoom.pause();
 // ------------------------------------------------------------------------- //
      window.addEventListener("keydown", function(e) {
       // console.log(e.keyCode);
@@ -91,12 +95,17 @@
 
         if ( keyCode == 13 ) {
 
-             svgX = Math.round((sArea.getSelection().x1 - panX) 
-                                / svgScale / pzScale);
-             svgY = Math.round((sArea.getSelection().y1 - panY) 
-                               / svgScale / pzScale);
-             svgW = Math.round(wSrc / pzScale);
-             svgH = Math.round(hSrc / pzScale);
+             svgScale = $('div#svg').width() / svgWidth;
+             svgX = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
+             svgY = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
+           //svgW =  wSrc / pzScale;
+           //svgH =  hSrc / pzScale;
+           //svgW = ((sArea.getSelection().x2 - panX) / svgScale / pzScale)
+           //      - ((sArea.getSelection().x1 - panX) / svgScale / pzScale);
+           //svgH = ((sArea.getSelection().y2 - panY) / svgScale / pzScale)
+           //      - ((sArea.getSelection().y1 - panY) / svgScale / pzScale);
+             svgW = sArea.getSelection().width / svgScale / pzScale;
+             svgH = sArea.getSelection().height / svgScale / pzScale;
 
              addCropBox(svgX,svgY,svgW,svgH);
          }
@@ -143,9 +152,20 @@
 // ------------------------------------------------------------------------- //
    function pushSelection() {
 
-      W = wSrc/pzScale;H = hSrc/pzScale;
+console.log("pushSelection svgScale:" + svgScale);
+
+    //W = wSrc/pzScale;H = hSrc/pzScale;
+    //svgScale = $('div#svg').width() / svgWidth;
       X = (sArea.getSelection().x1-panX)/svgScale/pzScale;
       Y = (sArea.getSelection().y1-panY)/svgScale/pzScale;
+/*    W = ((sArea.getSelection().x2-panX)/svgScale/pzScale);
+         - ((sArea.getSelection().x1-panX)/svgScale/pzScale);
+      H = ((sArea.getSelection().y2-panY)/svgScale/pzScale);
+         - ((sArea.getSelection().y1-panY)/svgScale/pzScale);
+*/
+      W = sArea.getSelection().width  / svgScale / pzScale;
+      H = sArea.getSelection().height / svgScale / pzScale;
+
       cB = document.createElementNS(svgNS,"rect");
       cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
       cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
@@ -181,16 +201,17 @@
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizing = false;
                             popSelection();
-                            calculateCropBox(); }
+                          /*calculateCropBox();*/ 
+                            windowWidth = $(window).width(); }
 // ------------------------------------------------------------------------- //
-   function calculateCropBox() {
+/* function calculateCropBox() {
 
       x1 = sArea.getSelection().x1;y1 = sArea.getSelection().y1;
       x2 = sArea.getSelection().x2;y2 = sArea.getSelection().y2;
 
       canvasWidth = $('div#svg').width();
       svgScale = canvasWidth / svgWidth;
-
+      
       xSrc = Math.round(sArea.getSelection().x1     / svgScale);
       ySrc = Math.round(sArea.getSelection().y1     / svgScale);
       wSrc = Math.round(sArea.getSelection().width  / svgScale);
@@ -198,7 +219,7 @@
 
       windowWidth = $(window).width(); // SAVE WHEN RESIZE IS DONE
 
-   }
+   } */
 // ------------------------------------------------------------------------- //
    function editCropBox(sID) {
 
@@ -221,7 +242,7 @@
        sArea.setSelection(x,y,x+w,y+h);
        sArea.setOptions({show:true});
        sArea.update();
-       calculateCropBox();
+     //calculateCropBox();
 
    }
 // ------------------------------------------------------------------------- //
@@ -249,10 +270,10 @@
 // ------------------------------------------------------------------------- //
    function showCropBox(sID) {
 
-     x = zeroX + Number($(sID).attr("x"));
-     y = zeroY + Number($(sID).attr("y"));
-     w = $(sID).attr("width");
-     h = $(sID).attr("height");
+     x = Math.round(zeroX + Number($(sID).attr("x")));
+     y = Math.round(zeroY + Number($(sID).attr("y")));
+     w = Math.round($(sID).attr("width"));
+     h = Math.round($(sID).attr("height"));
      mdshcode = "% SHOW: " + svgUrl + 
                 " --panZoom=" + x + 
                 ":"        + y +
