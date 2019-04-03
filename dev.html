@@ -45,6 +45,7 @@
      sArea = $('#viewport')
              .imgAreaSelect({handles:true,
                              instance:true,
+                             keys:true,
                              onSelectEnd:function(){recalculateSelection();}
                             });
 
@@ -208,8 +209,10 @@ console.log(offsetScale);
 // ------------------------------------------------------------------------- //
    function editSelection(sID) {
 
-       svgX = Number($(sID).attr("x"));
-       svgY = Number($(sID).attr("y"));
+     //svgX = Number($(sID).attr("x"));
+       svgX = getCoords(sID)[0];
+     //svgY = Number($(sID).attr("y"));
+       svgY = getCoords(sID)[1];
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
        sID.remove();
@@ -217,13 +220,13 @@ console.log(offsetScale);
        canvasWidth = $('div#svg').width();
        srcScale = canvasWidth / srcWidth;
 
-       xS = Math.round(svgX * srcScale);
-       yS = Math.round(svgY * srcScale);
-       wS = Math.round(svgW * srcScale);
-       hS = Math.round(svgH * srcScale);
-       
+       xS = svgX;
+       yS = svgY;
+       wS = Math.round(svgW * srcScale * zoomScale);
+       hS = Math.round(svgH * srcScale * zoomScale);
+ 
        sArea.setSelection(xS,yS,xS+wS,yS+hS);
-       sArea.setOptions({ show: true });
+       sArea.setOptions({show:true,enable:true});
        sArea.update();
 
    }
@@ -269,8 +272,30 @@ console.log(offsetScale);
 
    }
 // ------------------------------------------------------------------------- //
- </script>
+  // https://stackoverflow.com/questions/5598743/
+ // -> finding-elements-position-relative-to-the-document
+// ----------------------------------------------------------------------- // 
+  function getCoords(elem) { // crossbrowser version
 
+       var box = elem.getBoundingClientRect();
+   
+       var body = document.body;
+       var docEl = document.documentElement;
+   
+       var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+       var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+   
+       var clientTop = docEl.clientTop || body.clientTop || 0;
+       var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+   
+       var top  = box.top +  scrollTop - clientTop;
+       var left = box.left + scrollLeft - clientLeft;
+   
+     //return { top: Math.round(top), left: Math.round(left) };
+       return [Math.round(left),Math.round(top)];
+   }
+// ------------------------------------------------------------------------- //
+ </script>
  <script>
 // ------------------------------------------------------------------------- //   
    $(document).ready(function() {
