@@ -120,6 +120,11 @@
 // ------------------------------------------------------------------------- //
    function editCropBox(sID) {
 
+       if ( pendingRm != "" ) {
+            rmCropBox(pendingRm);
+            pendingRm = ""; 
+       }
+
        iD = $(sID).attr('id');
        borderWidth = 10;
 
@@ -128,7 +133,7 @@
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
 
-    // RM FROM UI BUT DELETE ONLY IF SELECTION CHANGES
+    // RM FROM UI BUT WAIT FOR DELETION UNTIL SELECTION CHANGES
        pendingRm = sID;
        i = cBList.indexOf(iD);
        if (i != -1) { cBList.splice(i,1); }
@@ -189,7 +194,10 @@
         cB.setAttributeNS(null,"onmouseover","showCropBox(this)");
         document.getElementById("showCropBoxes").appendChild(cB);
 
+        cBList.push(iD);
+
       }
+
 
       pendingRm = ""; // RESET (=> DO NOT DELETE)
 
@@ -215,8 +223,6 @@
                     W + ":" +
                     H;
   
-        cBList.push(iD);
-
         console.log(saveThis); // DEV /////////////////////////////////////
 
        }
