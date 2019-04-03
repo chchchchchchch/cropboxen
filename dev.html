@@ -24,20 +24,27 @@
    var zoomY = 0;
    var zoomScale = 1;
 
+var x1,x2,y1,y2;
+
    var editMode = false;
 
    var resizeTimeout;
+
    var windowWidth = $(window).width();
    var canvasWidth = $('div#svg').width();
    var srcScale = canvasWidth / srcWidth;
+
+   var displayScale = 1;
+
    var sArea;
+
 // ------------------------------------------------------------------------- //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
      sArea = $('#viewport')
              .imgAreaSelect({handles:true,
                              instance:true,
-                             onSelectEnd:function(){ recalculateSelection();}
+                             onSelectEnd:function(){recalculateSelection();}
                             });
 
 // ------------------------------------------------------------------------- //
@@ -47,6 +54,8 @@
              zoomX = area.getTransform().x;
              zoomY = area.getTransform().y;
              zoomScale = area.getTransform().scale;
+
+             displayScale = windowScale / zoomScale;
 
      });
      area.pause();
@@ -142,32 +151,44 @@
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizeSelection(sArea);recalculateSelection(); }
 // ------------------------------------------------------------------------- //
-   function recalculateSelection() {
+   function recalculateSelection() { // recalculateCropBox (?)
 
-      windowWidth = $(window).width();
-      x1 = sArea.getSelection().x1;
-      y1 = sArea.getSelection().y1;
-      x2 = sArea.getSelection().x2;
-      y2 = sArea.getSelection().y2;
+      x1 = sArea.getSelection().x1;y1 = sArea.getSelection().y1;
+      x2 = sArea.getSelection().x2;y2 = sArea.getSelection().y2;
 
       canvasWidth = $('div#svg').width();
       srcScale = canvasWidth / srcWidth;
 
-      xSrc = Math.round(sArea.getSelection().x1 / srcScale);
-      ySrc = Math.round(sArea.getSelection().y1 / srcScale);
+      xSrc = Math.round(sArea.getSelection().x1     / srcScale);
+      ySrc = Math.round(sArea.getSelection().y1     / srcScale);
       wSrc = Math.round(sArea.getSelection().width  / srcScale);
       hSrc = Math.round(sArea.getSelection().height / srcScale);
+
+      windowWidth = $(window).width(); // SAVE WHEN RESIZE IS DONE
 
    }
 // ------------------------------------------------------------------------- //
    function resizeSelection(sArea) {
-        windowScale = $(window).width() / windowWidth;
 
-        sArea.setSelection((x1 * windowScale) * zoomScale,
-                           (y1 * windowScale) * zoomScale,
-                           (x2 * windowScale) * zoomScale,
-                           (y2 * windowScale) * zoomScale);
+
+        windowScale = $(window).width() / windowWidth;
+/*
+        sArea.setSelection(x1 * windowScale,y1 * windowScale,
+                           x2 * windowScale,y2 * windowScale);
+
+*/
+/*
+        sArea.setSelection(x1 * windowScale * displayScale,
+                           y1 * windowScale * displayScale,
+                           x2 * windowScale * displayScale,
+                           y2 * windowScale * displayScale);
+*/
+        sArea.setSelection(x1 * displayScale,
+                           y1 * displayScale,
+                           x2 * displayScale,
+                           y2 * displayScale);
         sArea.update();
+
    }
 // ------------------------------------------------------------------------- //
    function rmSelection(sID) { // TODO: post
@@ -180,32 +201,6 @@
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
      //sID.remove();
-
-/*
-       sArea.setSelection(Math.round((svgX + zoomX) * srcScale / zoomScale),
-             Math.round((svgY + zoomY) * srcScale / zoomScale),
-             Math.round(svgW * srcScale / zoomScale),
-             Math.round(svgH * srcScale / zoomScale));
-*/
-
-
-           //zoomX = area.getTransform().x;
-           //zoomY = area.getTransform().y;
-           //zoomScale = area.getTransform().scale;
-
-
-console.log(area);
-
-
-
-/*
-       sArea.setSelection(svgX / srcScale,
-                          0,
-                          svgW * srcScale,
-                          svgH * srcScale);
-       sArea.setOptions({show:true});
-       sArea.update();
-*/
 
    }
 // ------------------------------------------------------------------------- //
