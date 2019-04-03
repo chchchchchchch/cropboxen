@@ -1,8 +1,6 @@
-   var pzSave;
-   var panX = 0;var panY = 0;var pzScale = 1;
+   var panZoom;var pzSave;var panX = 0;var panY = 0;var pzScale = 1;
 
-   var sArea;
-   var x1,x2,y1,y2;
+   var sArea;var x1,x2,y1,y2;
 
    var editMode = false;
    var svgNS = "http://www.w3.org/2000/svg";
@@ -25,7 +23,7 @@
                           });
 
 // ------------------------------------------------------------------------- //
-   var panZoom = panzoom(document.getElementById('svg'));
+   panZoom = panzoom(document.getElementById('svg'));
    panZoom.on('transform', function(e) {
 
            panX = panZoom.getTransform().x;
