@@ -3,6 +3,7 @@
    var sArea;
 
    var editMode = false;
+   var selection = false;
    var svgNS = "http://www.w3.org/2000/svg";
 
    var resizing = false;var resizeTimeout;
@@ -19,7 +20,7 @@
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
                            instance:true,
-                           onSelectEnd:function(){/**/}
+                           onSelectEnd:function(){ selection = true; }
                           });
 
 // ------------------------------------------------------------------------- //
@@ -62,40 +63,51 @@
    function pushSelection() {
 
       W = sArea.getSelection().width  / svgScale / pzScale;
-      H = sArea.getSelection().height / svgScale / pzScale;
-      X = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
-      Y = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
 
-      cB = document.createElementNS(svgNS,"rect");
-      cB.setAttributeNS(null,"x",X);cB.setAttributeNS(null,"y",Y);
-      cB.setAttributeNS(null,"width",W);cB.setAttributeNS(null,"height",H);
-      cB.setAttributeNS(null,"id","tmp");
-      cB.setAttributeNS(null,"style","visibility:hidden");
-      document.getElementById("showCropBoxes").appendChild(cB);
+      if ( W > 0 ) {
+
+           selection = true;
+           H = sArea.getSelection().height / svgScale / pzScale;
+           X = (sArea.getSelection().x1 - panX) / svgScale / pzScale;
+           Y = (sArea.getSelection().y1 - panY) / svgScale / pzScale;
+     
+           cB = document.createElementNS(svgNS,"rect");
+           cB.setAttributeNS(null,"x",X)
+           cB.setAttributeNS(null,"y",Y);
+           cB.setAttributeNS(null,"width",W)
+           cB.setAttributeNS(null,"height",H);
+           cB.setAttributeNS(null,"id","tmp");
+           cB.setAttributeNS(null,"style","visibility:hidden");
+           document.getElementById("showCropBoxes").appendChild(cB);
+
+      } else { selection = false; }
 
    }
 // ------------------------------------------------------------------------- //
    function popSelection() {
 
-      sID = document.getElementById('tmp');
+      if ( selection == true ) {
 
-      svgX = getCoords(sID)[0];
-      svgY = getCoords(sID)[1];
-      svgW = Number($(sID).attr("width"));
-      svgH = Number($(sID).attr("height"));
-      sID.remove();
+           sID = document.getElementById('tmp');
+     
+           svgX = getCoords(sID)[0];
+           svgY = getCoords(sID)[1];
+           svgW = Number($(sID).attr("width"));
+           svgH = Number($(sID).attr("height"));
+           sID.remove();
+     
+           canvasWidth = $('div#svg').width();
+           svgScale = canvasWidth / svgWidth;
+     
+           x = svgX;y = svgY;
+           w = svgW * svgScale * pzScale;
+           h = svgH * svgScale * pzScale;
+     
+           sArea.setSelection(x,y,x+w,y+h);
+           sArea.setOptions({show:true});
+           sArea.update();
 
-      canvasWidth = $('div#svg').width();
-      svgScale = canvasWidth / svgWidth;
-
-      x = svgX;y = svgY;
-      w = svgW * svgScale * pzScale;
-      h = svgH * svgScale * pzScale;
-
-      sArea.setSelection(x,y,x+w,y+h);
-      sArea.setOptions({show:true});
-      sArea.update();
-
+      }
    }
 // ------------------------------------------------------------------------- //
    function editCropBox(sID) {
