@@ -24,7 +24,10 @@
    var zoomY = 0;
    var zoomScale = 1;
 
-var x1,x2,y1,y2;
+   var x1,x2,y1,y2;
+   var offsetX = 0;
+   var offsetY = 0;
+   var offsetScale = 1;
 
    var editMode = false;
 
@@ -33,8 +36,6 @@ var x1,x2,y1,y2;
    var windowWidth = $(window).width();
    var canvasWidth = $('div#svg').width();
    var srcScale = canvasWidth / srcWidth;
-
-   var displayScale = 1;
 
    var sArea;
 
@@ -55,7 +56,8 @@ var x1,x2,y1,y2;
              zoomY = area.getTransform().y;
              zoomScale = area.getTransform().scale;
 
-             displayScale = windowScale / zoomScale;
+             offsetX = zoomX;
+             offsetScale = zoomScale;
 
      });
      area.pause();
@@ -149,7 +151,8 @@ var x1,x2,y1,y2;
 <script>
 
 // ------------------------------------------------------------------------- //
-   function doneResizing(){ resizeSelection(sArea);recalculateSelection(); }
+   function doneResizing(){ resizeSelection(sArea);recalculateSelection();
+                            offsetX=0;offsetScale=1; }
 // ------------------------------------------------------------------------- //
    function recalculateSelection() { // recalculateCropBox (?)
 
@@ -158,6 +161,9 @@ var x1,x2,y1,y2;
 
       canvasWidth = $('div#svg').width();
       srcScale = canvasWidth / srcWidth;
+
+      offsetX = zoomX;
+      offsetScale = zoomScale;
 
       xSrc = Math.round(sArea.getSelection().x1     / srcScale);
       ySrc = Math.round(sArea.getSelection().y1     / srcScale);
@@ -171,7 +177,7 @@ var x1,x2,y1,y2;
    function resizeSelection(sArea) {
 
 
-        windowScale = $(window).width() / windowWidth;
+//      windowScale = $(window).width() / windowWidth;
 /*
         sArea.setSelection(x1 * windowScale,y1 * windowScale,
                            x2 * windowScale,y2 * windowScale);
@@ -183,10 +189,16 @@ var x1,x2,y1,y2;
                            x2 * windowScale * displayScale,
                            y2 * windowScale * displayScale);
 */
-        sArea.setSelection(x1 * displayScale,
-                           y1 * displayScale,
-                           x2 * displayScale,
-                           y2 * displayScale);
+
+        windowScale = $(window).width() / windowWidth;
+console.log(offsetScale);
+        xS = x1 * windowScale * offsetScale;        // X SELECTION
+        yS = y1 * windowScale;        // X SELECTION
+        wS = (x2 - x1) * windowScale; // WIDTH SELECTION
+        hS = (y2 - y1) * windowScale; // HEIGHT SELECTION
+
+        sArea.setSelection(xS,yS,xS+wS,yS+hS);
+
         sArea.update();
 
    }
@@ -200,7 +212,19 @@ var x1,x2,y1,y2;
        svgY = Number($(sID).attr("y"));
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
-     //sID.remove();
+       sID.remove();
+
+       canvasWidth = $('div#svg').width();
+       srcScale = canvasWidth / srcWidth;
+
+       xS = Math.round(svgX * srcScale);
+       yS = Math.round(svgY * srcScale);
+       wS = Math.round(svgW * srcScale);
+       hS = Math.round(svgH * srcScale);
+       
+       sArea.setSelection(xS,yS,xS+wS,yS+hS);
+       sArea.setOptions({ show: true });
+       sArea.update();
 
    }
 // ------------------------------------------------------------------------- //
