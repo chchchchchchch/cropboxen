@@ -151,7 +151,7 @@
      w = Math.round($(sID).attr("width"));
      h = Math.round($(sID).attr("height"));
      mdshcode = "% SHOW: " + svgUrl + 
-                " --panZoom=" + x + 
+                " --area=" + x + 
                 ":"        + y +
                 ":"        + w +
                 ":"        + h;
