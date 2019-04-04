@@ -19,7 +19,7 @@ div.svg > .layer { position:absolute;
 
 
 #layercontrol { position:absolute;
-                right:0;top:0;z-index:500000;
+                right:0;top:50px;z-index:500000;
                 width:20vw;height:100vh;
                 background-color:#eeeeee;
 }
@@ -47,3 +47,11 @@ word-wrap: break-word;
 .croparea:hover { fill:#00ffff; }
 
 .onTop { z-index:300000!important; }
+
+#versions { position:absolute;
+            right:0;top:0;z-index:500002;
+            width:20vw;height:40px;
+}
+
+#versions > select { width:20vw; }
+
