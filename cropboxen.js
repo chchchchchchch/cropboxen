@@ -56,6 +56,11 @@
                            clearTimeout(resizeTimeout);
                            resizeTimeOut = setTimeout(doneResizing(),800);});
 // ------------------------------------------------------------------------- //
+  // https://stackoverflow.com/questions/13283875/
+  // -> how-can-i-stop-a-html-checkbox-from-getting-focus-on-click
+  $('input[type=checkbox]').mousedown(function (event) {
+                                                  event.preventDefault();});
+// ------------------------------------------------------------------------- //
    $('.layerSwitch').click(function() {
        layerName = $(this).attr('id');
        if( $(this).is(':checked')) {
