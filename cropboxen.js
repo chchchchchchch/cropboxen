@@ -253,7 +253,7 @@
      } else { layers = ""; }
 
      if ( vLCount == 0 ) { mdshcode = "NOTHING TO SEE!"
-     } else { mdshcode = "% SHOW: " + svgUrl + 
+     } else { mdshcode = "% SHOW: " + gitUrl + 
                          " --area=" + x + 
                          ":"        + y +
                          ":"        + w +
