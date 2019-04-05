@@ -3,6 +3,8 @@
 // GLOBALS                                                                   //
 // ------------------------------------------------------------------------- //
    $srcBasePath = "_";
+   $jsPath  = "lib/js/";
+   $cssPath = "lib/css/";
    $foo = array();$foo[0] = '/%SRCID%/';$foo[1] = '/%VERSION%/';
    $urlPattern  = "https://freeze.sh/_/2019/icebergen/cropboxen.php?show=%SRCID%&v=%VERSION%";
 
@@ -231,14 +233,13 @@
 <html lang="en">
 <head><meta charset="UTF-8">
 
- <link rel="stylesheet" href="lib/css/svg.css">
- <link rel="stylesheet" href="lib/css/imgareaselect-animated.css">
- <link rel="stylesheet" href="lib/css/imgareaselect-default.css">
+ <link rel="stylesheet" href="<?php echo $cssPath;?>svg.css">
+ <link rel="stylesheet" href="<?php echo $cssPath;?>imgareaselect-default.css">
 
- <script src="lib/js/jquery-3.3.1.js"></script>
- <script src="lib/js/jquery.imgareaselect.js"></script>
- <script src="lib/js/jquery.md5.js"></script>
- <script src="lib/js/panzoom.js"></script>
+ <script src="<?php echo $jsPath;?>jquery-3.3.1.js"></script>
+ <script src="<?php echo $jsPath;?>jquery.imgareaselect.js"></script>
+ <script src="<?php echo $jsPath;?>jquery.md5.js"></script>
+ <script src="<?php echo $jsPath;?>panzoom.js"></script>
  <script>      var viD = <?php echo '"' . $viD . '"'; ?>;
              var srcID = <?php echo '"' . $srcID . '"'; ?>;
             var gitUrl = <?php echo '"' . $gitUrl . '"'; ?>;
