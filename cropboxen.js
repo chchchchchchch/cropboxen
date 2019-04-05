@@ -76,7 +76,9 @@
        visibleLayers();
      });
 // ------------------------------------------------------------------------- //
-   $("#switchversion").change(function(){window.location="?v="+this.value;});
+   $("#switchversion").change(function(){ 
+     window.location = "?v=" + this.value + "&show=" + srcID;
+   });
 // ------------------------------------------------------------------------- //
    })
 // ========================================================================= //
@@ -172,17 +174,19 @@
 
         iD = $(sID).attr('id');
   
-        // TODO: post
-        timestamp = $.now();
-        saveThis = "D:" +
-                    timestamp + ":" +
-                    iD;
-  
         i = cBList.indexOf(iD);
         if (i != -1) { cBList.splice(i,1); }
         $(sID).remove(); 
   
-        console.log(saveThis); // DEV //////////////////////////////////////
+        flag = "D";
+        xywh = "0:0:0:0"; 
+
+        $.ajax({
+           url: "?do=w",
+           data: {flag:flag,area:xywh,id:iD,viD:viD,srcID:srcID},
+           datatype: "text",
+           type: "POST",
+        });
 
       } // else { console.log("NOTHING TO DO"); }
 
@@ -211,7 +215,6 @@
 
       }
 
-
       pendingRm = ""; // RESET (=> DO NOT DELETE)
 
    }
@@ -225,18 +228,15 @@
       if ( checkCBList <= 0 ) {
   
         drawCropBox(X,Y,W,H);
+        flag = "A";
+        xywh = X+":"+Y+":"+W+":"+H; 
 
-        // TODO: post
-        timestamp = $.now();
-        saveThis = "A:" +
-                    timestamp + ":" +
-                    iD + ":" +
-                    X + ":" +
-                    Y + ":" +
-                    W + ":" +
-                    H;
-  
-        console.log(saveThis); // DEV /////////////////////////////////////
+        $.ajax({
+           url: "?do=w",
+           data: {flag:flag,area:xywh,id:iD,viD:viD,srcID:srcID},
+           datatype: "text",
+           type: "POST",
+        });
 
        }
    }

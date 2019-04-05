@@ -7,15 +7,59 @@
    $urlPattern  = "https://freeze.sh/_/2019/icebergen/cropboxen.php?show=%SRCID%&v=%VERSION%";
 
 // ------------------------------------------------------------------------- // 
-// SAVE                                                                      // 
+// SAVE CROPBOX                                                              // 
 // ------------------------------------------------------------------------- //
-   if ( $_GET['do'] == "w" ) {
+   if ( isset( $_GET['do']) &&
+        $_GET['do'] == "w" ) {
+
      if ( isset($_POST['id']) &&
+          isset($_POST['viD']) &&
           isset($_POST['area']) &&
-          isset($_POST['flag']) ) {
+          isset($_POST['flag'])  &&
+          isset($_POST['srcID'])  &&
+          count($_POST) == 5 ) {
 
+          $id    = strip_tags(trim($_POST['id' ]));
+          $area  = strip_tags(trim($_POST['area']));
+          $srcID = strip_tags(trim($_POST['srcID']));
+          $viD   = strip_tags(trim($_POST['viD'] ));
+          $flag  = strip_tags(trim($_POST['flag']));
 
-    }
+       // VERIFY INPUT
+
+          if ($flag=="D"){$idMatch=true;}
+          if ($flag=="A"){if(substr(md5($area),0,11)==$id){$idMatch=true;}}
+
+          if ( $flag == "A" || $flag == "D"           &&
+               strlen($id) == 11 && $idMatch           &&
+               preg_replace('/[0-9a-f]/','',$id) == ""  &&
+               preg_replace('/[0-9:-]/','',$area) == ""  &&
+               preg_replace('/[0-9a-f]/','',$viD)  == ""  &&
+               preg_replace('/[0-9a-f]/','',$srcID) == "" ){
+
+          $vBasePath = $srcBasePath . "/" . $srcID . "/" .$viD;
+
+          if ( file_exists($vBasePath . ".txt")) {
+
+            $file = $vBasePath . ".bxn";
+            $timestamp = round(microtime(true) * 1000);
+  
+            if ( $flag == "A" ) {
+                  $write = $flag.":".$timestamp.":".$id.":".$area;
+            } else if ( $flag == "D" ) {
+                         $write = $flag.":".$timestamp.":".$id; 
+            }
+
+            $f = fopen($file, "a"); // APPEND
+            fwrite($f,$write."\n");
+            // Close the text file
+            fclose($f);
+
+          }
+        }
+      }
+
+     exit;
    } 
 // ------------------------------------------------------------------------- // 
 // EDIT                                                                      // 
@@ -195,7 +239,8 @@
  <script src="lib/js/jquery.imgareaselect.js"></script>
  <script src="lib/js/jquery.md5.js"></script>
  <script src="lib/js/panzoom.js"></script>
- <script>    var srcID = <?php echo '"' . $srcID . '"'; ?>;
+ <script>      var viD = <?php echo '"' . $viD . '"'; ?>;
+             var srcID = <?php echo '"' . $srcID . '"'; ?>;
             var gitUrl = <?php echo '"' . $gitUrl . '"'; ?>;
           var svgWidth = <?php echo $svgWdth; ?>;
              var zeroX = <?php echo $zeroX; ?>; // srcOffsetX ???
