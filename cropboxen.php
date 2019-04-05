@@ -22,10 +22,10 @@
           count($_POST) == 5 ) {
 
           $id    = strip_tags(trim($_POST['id' ]));
-          $area  = strip_tags(trim($_POST['area']));
-          $srcID = strip_tags(trim($_POST['srcID']));
           $viD   = strip_tags(trim($_POST['viD'] ));
           $flag  = strip_tags(trim($_POST['flag']));
+          $area  = strip_tags(trim($_POST['area']));
+          $srcID = strip_tags(trim($_POST['srcID']));
 
        // VERIFY INPUT
 
@@ -104,7 +104,7 @@
   // -------------------------------------------------------------------- //
      if ( isset( $_GET['v'] )) { 
 
-      $viD = strip_tags(trim($_GET['v'])); // TODO: DIFFERENTS FORMATS/VERIFY
+      $viD = strip_tags(trim($_GET['v'])); // TODO: DIFFERENT FORMATS/VERIFY
 
      }
      $vConf   = $srcBasePath . "/" . $srcID . "/" . $viD . ".txt";
@@ -129,12 +129,12 @@
      $conf = loadConfig($srcBasePath."/".$srcID."/".$viD);
      $layers = getLayers($srcBasePath."/".$srcID."/".$viD,$conf);
 
-     $svgWdth = $conf['W'];
-     $svgHght = $conf['H'];
-     $zeroX   = explode(':',$conf['AREA'])[0];
-     $zeroY   = explode(':',$conf['AREA'])[1];
-     $gitUrl  = $conf['GITURL'];
-     $bgColor = $conf['BGCOLOR'];     
+     $svgWdth = getValue($conf,'W','REQUIRED');
+     $svgHght = getValue($conf,'H','REQUIRED');
+     $zeroX   = explode(':',getValue($conf,'AREA','REQUIRED'))[0];
+     $zeroY   = explode(':',getValue($conf,'AREA','REQUIRED'))[1];
+     $gitUrl  = getValue($conf,'GITURL','GIT URL MISSING');
+     $bgColor = getValue($conf,'BGCOLOR','#ffffff');     
   // -------------------------------------------------------------------- //
      function getVersions($srcPath) {
 
@@ -155,7 +155,8 @@
       foreach ( glob($vBasePath . "*.svg") as $layerFile ) {
 
                 $liD = rtrim(substr($layerFile,-10,6));
-                $layerName = $conf[$liD];
+              //$layerName = $conf[$liD];
+                $layerName = getValue($conf,$liD,'LAYER NAME MISSING');
                 $visibility = rtrim(substr($layerFile,-12,1));
                 $zIndex = substr($count,-4);
                 $layers[$liD] = array('layerfile'  => $layerFile,
@@ -223,6 +224,19 @@
      function humanTime($timestamp) {  
 
 
+     }
+  // -------------------------------------------------------------------- //
+     function getValue($array,$index,$continue = 'NOT REQUIRED') {
+
+        if (isset($array[$index])) { $value = $array[$index];
+                                     return $value;
+        } else { if ( $continue == "REQUIRED" ) {
+                      echo "SOMETHING WENT WRONG";
+                      exit;
+                 } else if ( $continue != "NOT REQUIRED" ) {
+                             return $continue;
+                 }
+        }
      }
   // -------------------------------------------------------------------- //
 ?>
