@@ -1,0 +1,227 @@
+# --------------------------------------------------------------------------- #
+  if [ "$TMP" == "" ] || [ "$TMPDIR" == "" ]
+   then #echo "TMP NOT SET"
+        TMPDIR="/tmp";TMP="$TMPDIR/tmp"
+  #else echo "TMP SET"
+  fi
+# --------------------------------------------------------------------------- #
+  INKSCAPEEXTENSION=lib/python
+  export PYTHONPATH=$INKSCAPEEXTENSION
+  APPLYTRANSFORMPY=lib/python/applytransform.py
+# --------------------------------------------------------------------------- #
+  function svgHasImage() {
+
+  ( SVG="$1"
+    HASIMG=`grep "<image" $SVG`
+    echo $HASIMG
+
+   )
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgRmImage() {
+
+  ( DUMMYSTYLE='style="fill:#ffff99;stroke:none"'
+
+    SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
+    OUT=`echo $* | sed 's/ /\n/' | grep "svg$" | tail -n 1`
+    if [ "$SVG" == "" ] ||
+       [ ! -f "$SVG" ];then echo "PLEASE PROVIDE INPUT FILE";fi
+    if [ "$OUT" == "$SVG" ];then echo "PLEASE PROVIDE OUTPUT FILE";fi
+    if [ -f "$SVG" ] && [ "$OUT" != "" ]
+     then
+          sed "s/<image/<rect $DUMMYSTYLE/g" $SVG   | # REPLACE IMAGE WITH RECT
+          sed '/^[ \t]*xlink:href="[^"]*"[ \t]*$/d' | # RM LINES WITH XLINK ONLY
+          sed 's/xlink:href="[^"]*"//g'             | # RM XLINK 
+          tee > $OUT                                  # WRITE TO FILE
+    fi
+
+   )
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgVHash() {
+
+  ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
+
+    if [ "$SVG" == "" ] ||
+       [ ! -f "$SVG" ];then echo "PLEASE PROVIDE INPUT FILE";fi
+    if [ -f "$SVG" ]
+     then SVGHASH="vhash."`md5sum $SVG | cut -c 1-16`
+          if [ ! -f  "${TMP}.${SVGHASH}.png" ]
+           then sed 's/display:none//g' $SVG > ${TMP}.${SVGHASH}.svg
+                inkscape --export-area-drawing           \
+                         --export-background=ff00cc       \
+                         --export-width=200                \
+                         --export-png=${TMP}.${SVGHASH}.png \
+                         ${TMP}.${SVGHASH}.svg > /dev/null 2>&1
+          fi
+          VHASH=`md5sum ${TMP}.${SVGHASH}.png | cut -d " " -f 1`
+          echo $VHASH
+    fi
+  )
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgGetLayerSetup() { # VISIBILITY ACCORDING TO LAYER ORDER
+
+  ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
+
+  )
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgGetDimensions() { # VISIBILITY ACCORDING TO LAYER ORDER
+
+  ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
+
+  # THIS COULD BE DONE BETTER (?!)
+  # ------------------------------
+  # X=`inkscape -X $SVG | cut -d "." -f 1`
+  # Y=`inkscape -Y $SVG | cut -d "." -f 1`
+  # W=`inkscape -W $SVG | cut -d "." -f 1`
+  # H=`inkscape -H $SVG | cut -d "." -f 1`
+  # echo "$X:$Y:$W:$H"
+
+    AREA=`inkscape -S $SVG | #
+          head -n 1        | #
+          cut -d "," -f 2- | #
+          sed 's/\(\.[0-9]*\)\(\b\)/\2/g' | #
+          sed 's/,/:/g'`
+    echo $AREA
+
+  )
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgLayers2Files() {
+
+  ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
+    OUT=`echo $* | sed 's/ /\n/' | grep -v "svg$" | tail -n 1`
+    OUTDIR=`dirname $OUT`
+    if [ ! -d $OUTDIR ];then echo "$OUTDIR DOES NOT EXIST";fi
+    if [ "$SVG" == "" ] ||
+       [ ! -f "$SVG" ];then echo "PLEASE PROVIDE INPUT FILE";fi
+
+    if [ -f "$SVG" ] && [ "$OUT" != "" ] && [ -d "$OUTDIR" ]
+     then
+
+      L=LA`echo ${RANDOM} | cut -c 2`F0P
+      B=NL`echo ${RANDOM} | cut -c 1`F00;S=SP`echo ${RANDOM} | cut -c 1`F0O
+   # ----------------------------------------------------------------------- #
+   # MOVE LAYERS ON SEPARATE LINES (TEMPORARILY; EASIFY PARSING LATER ON)
+   # ----------------------------------------------------------------------- #
+     sed ":a;N;\$!ba;s/\n/$B/g" $SVG   | # RM ALL LINEBREAKS (BUT SAVE)
+     sed "s/ /$S/g"                    | # RM ALL SPACE (BUT SAVE)
+     sed 's/<g/\n<g/g'                 | # REDO GROUP OPEN + NEWLINE
+     sed "/mode=\"layer\"/s/<g/$L/g"   | # PLACEHOLDER FOR LAYERGROUP OPEN
+     sed ':a;N;$!ba;s/\n//g'           | # RM ALL LINEBREAKS (AGAIN)
+     sed "s/$L/\n<g/g"                 | # REDO LAYERGROUP OPEN + NEWLINE
+     sed 's/<\/svg>//g'                | # RM SVG CLOSE
+     tee > ${TMP}.layers                 # WRITE TO TEMPORARY FILE
+
+     C="1"
+     for LAYER in `cat ${TMP}.layers | sed '1d'`
+      do N=`echo 0000$C | rev | cut -c 1-4 | rev`
+         VISIBILITY=`echo $LAYER     | #
+                     sed "s/$B/\n/g" | #
+                     sed "s/$S/ /g"  | #
+                     grep "display:" | #
+                     head -n 1       | #
+                     cut -d '"' -f 2 | #
+                     cut -d ":" -f 2`  #
+         if [ "$VISIBILITY" = "inline" ];then V="1";else V="0";fi
+         LAYERNAME=`echo $LAYER                | #
+                    sed "s/$B/\n/g"            | #
+                    sed "s/$S/ /g"             | #
+                    grep "inkscape:label"      | #
+                    head -n 1 | cut -d '"' -f 2` #
+         LAYERNAMEID=`echo $LAYERNAME | md5sum | cut -c 1-6`
+        #echo ${LAYERNAMEID}:${LAYERNAME}
+         SVGOUT=${OUT}_${N}${V}_${LAYERNAMEID}.svg
+
+         head -n 1 ${TMP}.layers | #
+         sed "s/\(${S}\)*$//" | #
+         sed "s/\(${B}\)*$//" | #
+         sed "s/$B/\n/g"      | #
+         sed "s/$S/ /g"       | #
+         tee                  >  ${SVGOUT}
+         echo $LAYER          | #
+         sed "s/\(${S}\)*$//" | #
+         sed "s/\(${B}\)*$//" | #
+         sed "s/$B/\n/g"      | #
+         sed "s/$S/ /g"       | #
+         tee                  >> ${SVGOUT}
+         echo "</svg>"        >> ${SVGOUT}
+         C=`expr $C + 1`
+     done
+
+    fi
+  )
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgCropArea() {
+ 
+   ( SVGSRC="$1";TARGET="$2";CROPAREA="$3"
+ 
+     if [ "$CROPAREA" !=  "" ]
+      then # echo "CROPAREA IS SET"
+ 
+     XAREA=`echo $CROPAREA | cut -d ":" -f 1`
+     YAREA=`echo $CROPAREA | cut -d ":" -f 2`
+     WAREA=`echo $CROPAREA | cut -d ":" -f 3`
+     HAREA=`echo $CROPAREA | cut -d ":" -f 4`
+ 
+     XSHIFT=`python -c "print $XAREA * -1"`
+     YSHIFT=`python -c "print $YAREA * -1"`
+     WSHIFT="width=\"$WAREA\"";HSHIFT="height=\"$HAREA\""
+     TRANSFORM="transform=\"translate(${XSHIFT},${YSHIFT})\""
+ 
+     B=N`echo ${RANDOM} | cut -c 2`F0;
+   # ----------------------------------------------------------------------- #
+   # MOVE LAYERS ON SEPARATE LINES (TEMPORARILY; EASIFY PARSING LATER ON)
+   # ----------------------------------------------------------------------- #
+     sed ":a;N;\$!ba;s/\n/$B/g" $SVGSRC               | # RM ALL LINEBREAKS (BUT SAVE)
+     sed "s/width=\"[^\"]*\"/$WSHIFT/"                | # REDEFINE (FIRST) WIDTH
+     sed "s/height=\"[^\"]*\"/$HSHIFT/"               | # REDEFINE (FIRST) HEIGHT
+     sed "s/</\n&/g" | sed "s/>/&\n/g"                | # ADD LINEBREAKS TO BRACKETS <>
+     sed "/^<svg/s/>/&$B<g $TRANSFORM><!-- XX -->$B/" | # START OUTER GROUP
+     sed ":a;N;\$!ba;s/\n//g"                         | # RM ALL LINEBREAKS
+     sed "s/<\/svg/$B<\/g><!-- XX -->$B&/"            | # CLOSE OUTER GROUP
+     sed "s/$B/\n/g"                                  | # RESTORE LINEBREAKS
+     tee > ${TARGET}                                    # WRITE TO FILE
+ 
+      else
+         # echo "NO CROPAREA SET"
+           cp $SVGSRC $TARGET
+     fi
+   ) 
+
+  }
+# --------------------------------------------------------------------------- #
+  function svgBake() {
+
+  ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
+    OUT=`echo $* | sed 's/ /\n/' | grep "svg$" | tail -n 1`
+    if [ "$SVG" == "" ] ||
+       [ ! -f "$SVG" ];then echo "PLEASE PROVIDE INPUT FILE";fi
+    if [ "$OUT" == "$SVG" ];then echo "PLEASE PROVIDE OUTPUT FILE";fi
+    if [ -f "$SVG" ]
+     then
+          python $APPLYTRANSFORMPY ${SVG} | #
+          sed 's/<\/*g[^>]*>//g' > ${TMP}.svg
+          scour -i ${TMP}.svg           \
+                --enable-viewboxing      \
+                --enable-id-stripping     \
+                --enable-comment-stripping \
+                --shorten-ids --indent=none \
+                -o $OUT > /dev/null 2>&1 
+          rm ${TMP}.svg
+    fi
+
+   )
+
+  }
+# --------------------------------------------------------------------------- #
+
