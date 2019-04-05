@@ -1,24 +1,85 @@
 <?php 
+// ------------------------------------------------------------------------- //
+// GLOBALS                                                                   //
+// ------------------------------------------------------------------------- //
+   $srcBasePath = "_";
+   $foo = array();$foo[0] = '/%SRCID%/';$foo[1] = '/%VERSION%/';
+   $urlPattern  = "https://freeze.sh/_/2019/icebergen/cropboxen.php?show=%SRCID%&v=%VERSION%";
 
-  // -----------------------------------------------------------------------  //
-  // GLOBALS
-  // -----------------------------------------------------------------------  //
-     $srcBasePath = "_";
-     $srcID  = "00b329"; // TODO: $_GET
+// ------------------------------------------------------------------------- // 
+// SAVE                                                                      // 
+// ------------------------------------------------------------------------- //
+   if ( $_GET['do'] == "w" ) {
+     if ( isset($_POST['id']) &&
+          isset($_POST['area']) &&
+          isset($_POST['flag']) ) {
 
-  // -----------------------------------------------------------------------  //
+
+    }
+   } 
+// ------------------------------------------------------------------------- // 
+// EDIT                                                                      // 
+// ------------------------------------------------------------------------- // 
+   if ( isset($_GET['show']) ) {
+
+     $srcID = strip_tags(trim($_GET['show']));
+   
+   } else if ( !isset($_GET['show']) && 
+                isset($_GET['v'])  ) {
+
+     echo "NO SOURCE BUT VERSION SET. ";
+     $viD = strip_tags(trim($_GET['v']));
+     $allViD  = array_filter(glob($srcBasePath."/*/*.txt"));
+     $viDMatch  = array_values(preg_grep('/'.$viD.'/i',$allViD))[0];
+
+     $srcID = substr($viDMatch,2,6);
+   //------
+     $bar = array();$bar[0] =  $srcID ;$bar[1] = $viD;
+     $altUrl   = preg_replace($foo,$bar,$urlPattern);
+     echo '<a href="'.$altUrl.'">MAYBE?</a>';
+     exit;
+
+   } else { 
+
+     echo "SOMETHING WENT WRONG. ";
+     $allSrcID = array_filter(glob($srcBasePath.'/*'),'is_dir');
+     $rndSrcID = substr($allSrcID[array_rand($allSrcID)],-6,6);
+   //------
+     $bar = array();$bar[0] =  $rndSrcID ;$bar[1] = '0';
+     $altUrl   = preg_replace($foo,$bar,$urlPattern);
+   //header('Location:'.$altUrl);
+     echo '<a href="'.$altUrl.'">MAYBE?</a>';
+     exit;
+
+   }
+// ------------------------------------------------------------------------- //
+  // -------------------------------------------------------------------- //
   // LOAD/SET VARIABLES
-  // -----------------------------------------------------------------------  //
-     $versions = getVersions($srcBasePath."/".$srcID); // TODO: CHECK
+  // -------------------------------------------------------------------- //
      if ( isset( $_GET['v'] )) { 
 
       $viD = strip_tags(trim($_GET['v'])); // TODO: DIFFERENTS FORMATS/VERIFY
 
      }
-
-     $boxList = $srcBasePath . "/" . $srcID . "/" . $viD . ".bxn";
      $vConf   = $srcBasePath . "/" . $srcID . "/" . $viD . ".txt";
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
+     if ( !file_exists($vConf) ) {
+
+     //echo "SOMETHING WENT WRONG. ";
+       $allViD  = array_filter(glob($srcBasePath."/".$srcID."/*.txt"));
+     //$rndViD  = substr($allViD[array_rand($allViD)],-16,12);
+       $lastViD = substr(end($allViD),-16,12);
+       $bar = array();$bar[0] =  $srcID ;$bar[1] = $lastViD;
+       $altUrl   = preg_replace($foo,$bar,$urlPattern);
+     //echo '<a href="'.$altUrl.'">MAYBE?</a>';
+       header('Location:'.$altUrl);
+       exit;
+
+     }
+  // -------------------------------------------------------------------- //
+     $versions = getVersions($srcBasePath."/".$srcID); // TODO: CHECK
+     $boxList = $srcBasePath . "/" . $srcID . "/" . $viD . ".bxn";
+  // -------------------------------------------------------------------- //
      $conf = loadConfig($srcBasePath."/".$srcID."/".$viD);
      $layers = getLayers($srcBasePath."/".$srcID."/".$viD,$conf);
 
@@ -28,7 +89,7 @@
      $zeroY   = explode(':',$conf['AREA'])[1];
      $gitUrl  = $conf['GITURL'];
      $bgColor = $conf['BGCOLOR'];     
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
      function getVersions($srcPath) {
 
        $versions = array();
@@ -41,7 +102,7 @@
 
        return $versions;
      }
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
      function getLayers($vBasePath,$conf) {
 
       $layers = array();$count = 100001;
@@ -60,7 +121,7 @@
 
       return $layers;
      }
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
      function loadConfig($vBasePath) {
 
          global $gitUrl,$svgWdth,$svgHght;
@@ -81,7 +142,7 @@
 
          return $confLoad;
      }
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
      function loadCropBoxes($boxlist) {
  
         $list = array_values(array_filter(file($boxlist),"trim"));
@@ -115,12 +176,12 @@
  
         return $select;
      }
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
      function humanTime($timestamp) {  
 
 
      }
-  // -----------------------------------------------------------------------  //
+  // -------------------------------------------------------------------- //
 ?>
 <!doctype html>
 <html lang="en">
@@ -134,7 +195,8 @@
  <script src="lib/js/jquery.imgareaselect.js"></script>
  <script src="lib/js/jquery.md5.js"></script>
  <script src="lib/js/panzoom.js"></script>
- <script>   var gitUrl = <?php echo '"' . $gitUrl . '"'; ?>;
+ <script>    var srcID = <?php echo '"' . $srcID . '"'; ?>;
+            var gitUrl = <?php echo '"' . $gitUrl . '"'; ?>;
           var svgWidth = <?php echo $svgWdth; ?>;
              var zeroX = <?php echo $zeroX; ?>; // srcOffsetX ???
              var zeroY = <?php echo $zeroY; ?>; // srcOffsetY ???
@@ -244,6 +306,5 @@
 ?>
 </select>
 </div>
-
 </body>
 </html>
