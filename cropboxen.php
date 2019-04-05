@@ -64,7 +64,7 @@
      exit;
    } 
 // ------------------------------------------------------------------------- // 
-// EDIT                                                                      // 
+// DISPLAY/EDIT                                                              // 
 // ------------------------------------------------------------------------- // 
    if ( isset($_GET['show']) ) {
 
@@ -170,12 +170,9 @@
   // -------------------------------------------------------------------- //
      function loadConfig($vBasePath) {
 
-         global $gitUrl,$svgWdth,$svgHght;
-         $gitUrl  = "https://github.sfds/adsdsdf/bla.svg";
-         $svgWdth = "11916";
-         $svgHght = "7087";
-
-         $configFile = array_values(array_filter(file($vBasePath.".txt"),"trim"));
+         $configFile = array_values(
+                        array_filter(
+                         file($vBasePath.".txt"),"trim" ) );
     
          $confLoad = array();
          foreach($configFile as $line) {
