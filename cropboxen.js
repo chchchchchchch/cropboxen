@@ -141,7 +141,7 @@
        }
 
        iD = $(sID).attr('id');
-       borderWidth = 10;
+     //borderWidth = 0;
 
        svgX = getCoords(sID)[0];
        svgY = getCoords(sID)[1];
@@ -157,10 +157,10 @@
        canvasWidth = $('div#svg').width();
        svgScale = canvasWidth / svgWidth;
 
-       x = svgX + (borderWidth/2 * svgScale * pzScale);
-       y = svgY + (borderWidth/2 * svgScale * pzScale);
-       w = Math.round(svgW * svgScale * pzScale);
-       h = Math.round(svgH * svgScale * pzScale);
+       x = Math.floor(svgX);
+       y = Math.floor(svgY);
+       w = Math.ceil(svgW * svgScale * pzScale);
+       h = Math.ceil(svgH * svgScale * pzScale);
  
        sArea.setSelection(x,y,x+w,y+h);
        sArea.setOptions({show:true});
@@ -243,10 +243,10 @@
 // ------------------------------------------------------------------------- //
    function showCropBox(sID) {
 
-     x = Math.round(zeroX + Number($(sID).attr("x")));
-     y = Math.round(zeroY + Number($(sID).attr("y")));
-     w = Math.round($(sID).attr("width"));
-     h = Math.round($(sID).attr("height"));
+     x = Math.floor(zeroX + Number($(sID).attr("x")));
+     y = Math.floor(zeroY + Number($(sID).attr("y")));
+     w = Math.ceil($(sID).attr("width"));
+     h = Math.ceil($(sID).attr("height"));
 
      if ( vLCount < Object.keys(svgLayers).length ) { 
           layers = " --layers=" + vLList;
