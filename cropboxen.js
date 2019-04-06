@@ -141,10 +141,13 @@
        }
 
        iD = $(sID).attr('id');
-     //borderWidth = 0;
 
+       strokeWidth = $(sID).css("stroke-width");
+       $(sID).css("stroke-width","0");
        svgX = getCoords(sID)[0];
        svgY = getCoords(sID)[1];
+       $(sID).css("stroke-width",strokeWidth);
+
        svgW = Number($(sID).attr("width"));
        svgH = Number($(sID).attr("height"));
 
