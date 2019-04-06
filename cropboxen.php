@@ -243,10 +243,11 @@
 <!doctype html>
 <html lang="en">
 <head><meta charset="UTF-8">
-
  <link rel="stylesheet" href="<?php echo $cssPath;?>svg.css">
+ <style> div.svg { width:80vw;
+                   height:<?php echo ceil($svgHght/$svgWdth*80); ?>vw; }
+ </style>
  <link rel="stylesheet" href="<?php echo $cssPath;?>imgareaselect-default.css">
-
  <script src="<?php echo $jsPath;?>jquery-3.3.1.js"></script>
  <script src="<?php echo $jsPath;?>jquery.imgareaselect.js"></script>
  <script src="<?php echo $jsPath;?>jquery.md5.js"></script>
