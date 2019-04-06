@@ -43,6 +43,7 @@ word-wrap: break-word;
             stroke:#ff99ff;
             stroke-opacity:0.8;
             stroke-width:10;
+            paint-order:stroke;
 }
 .croparea:hover { fill:#00ffff; }
 
