@@ -139,11 +139,10 @@
          sed "s/$S/ /g"       | #
          tee                  >  ${SVGOUT}
          echo $LAYER          | #
-         sed "s/\(${S}\)*$//" | #
-         sed "s/\(${B}\)*$//" | #
-         sed "s/$B/\n/g"      | #
-         sed "s/$S/ /g"       | #
-         tee                  >> ${SVGOUT}
+         sed "s/\(${S}\)*$//" | sed "s/\(${B}\)*$//" | #
+         sed "s/$B/\n/g"      | sed "s/$S/ /g"       | #
+         sed 's/display:none/display:inline/g'       | #
+         tee                                         >> ${SVGOUT}
          echo "</svg>"        >> ${SVGOUT}
          C=`expr $C + 1`
      done
