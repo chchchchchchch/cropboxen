@@ -5,9 +5,11 @@
   #else echo "TMP SET"
   fi
 # --------------------------------------------------------------------------- #
-  INKSCAPEEXTENSION=lib/python
-  export PYTHONPATH=$INKSCAPEEXTENSION
-  APPLYTRANSFORMPY=lib/python/applytransform.py
+  INKSCAPEEXTENSION="lib/python"
+   INKSCAPEEXTENSION=`realpath $INKSCAPEEXTENSION`
+  export PYTHONPATH="$INKSCAPEEXTENSION"
+  APPLYTRANSFORMPY="lib/python/applytransform.py"
+   APPLYTRANSFORMPY=`realpath $APPLYTRANSFORMPY`
 # --------------------------------------------------------------------------- #
   function svgHasImage() {
 
