@@ -1,0 +1,31 @@
+# --------------------------------------------------------------------------- #
+  function validateUrl() {
+
+ (URL="$1"
+  RESPONSE=`curl -s -o /dev/null \
+            -IL -w "%{http_code}" $URL`
+  if [ $RESPONSE == '200' ]; then
+       echo $URL
+  else sleep 0
+  fi)
+
+  }
+# --------------------------------------------------------------------------- #
+  function expandUrl() {
+
+ (CHECKURL="$1"
+  EXPANDURL=`curl -sIL $CHECKURL | # CURL URL 
+             tr -d '\015'        | # CONFORM DOS END OF LINE
+             grep ^Location      | # SELECT LOCATION
+             cut -d ":" -f 2-    | # CUT SECOND FIELD
+             tail -n 1           | # SELECT LAST LINE
+             sed 's,[ \t]*,,'    | # REMOVE ALL SPACES
+             sed 's,/$,,'`
+  if [ "$EXPANDURL" == "" ]
+   then echo $CHECKURL
+   else echo $EXPANDURL
+  fi;)
+
+  }
+# --------------------------------------------------------------------------- #
+

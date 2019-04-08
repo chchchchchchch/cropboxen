@@ -1,0 +1,88 @@
+# SHORTEN URL (OPTIONAL) (github)
+
+# --------------------------------------------------------------------------- #
+  function verifyGitPath() {
+
+    if [ "$1" == "" ]
+     then echo "PLEASE PROVIDE ARGUMENT"
+     else if [ ! -d $1 ]
+           then echo "$1 DOES NOT EXIST"
+           else cd $1 
+                ISREPO=`git rev-parse --is-inside-work-tree 2> /dev/null`
+                if [ "$ISREPO" != "true" ]
+                 then echo "$1 IS NOT A GIT REPOSITORY (?)"
+                fi
+                cd - > /dev/null
+          fi
+     fi
+  }
+# --------------------------------------------------------------------------- #
+  function getGitRootPath() {
+
+    if [ "$1" == "" ]
+     then echo "PLEASE PROVIDE ARGUMENT"
+     else if [ ! -d $1 ]
+           then echo "$1 DOES NOT EXIST"
+           else cd $1 
+                git rev-parse --show-toplevel 2> /dev/null
+                cd - > /dev/null
+          fi
+     fi
+  }
+# --------------------------------------------------------------------------- #
+  function getGitRemoteBaseUrls() {
+
+    if [ "$1" == "" ]
+     then echo "PLEASE PROVIDE ARGUMENT"
+     else if [ ! -d $1 ]
+           then echo "$1 DOES NOT EXIST"
+           else cd $1 
+
+                RU=""
+                for R in `git branch -a   | #
+                          grep remotes/*  | #
+                          cut -d "/" -f 2 | #
+                          sort -u`          #
+                 do for U in url pushurl
+                     do RU="$RU "`git config --get-all remote.${R}.${U}`
+                   done
+                done
+                echo $RU                  | #
+                sed 's/ /\n/g'            | #
+                sed 's/:/\//'             | #
+                sed 's/^git@/https:\/\//' | #
+                sed 's/\.git$//'          | #
+                grep -n "" | sed 's/:/|/' | #
+                sort -t "|" -k 2,2 -u     | #
+                sort -t "|" -k 1,1        | #
+                cut -d "|" -f 2-
+
+                cd - > /dev/null
+          fi
+     fi
+  }
+# --------------------------------------------------------------------------- #
+  function getGitRawUrl() {
+
+  ( SHOWALL=`echo $* | sed 's/ /\n/g' | grep "^-a"`
+    GITREPOBASEURLS=`echo $* | sed 's/ /\n/g' | grep "^http"`
+    GITCOMMITHASH=`echo $* | sed 's/ /\n/g' | egrep "^[0-9a-f]*$"`
+    GITFILEPATH=`echo $* | sed 's/ /\n/g' | # 
+                 grep -v "^http"          | #
+                 egrep -v "^[0-9a-f]*$"   | #
+                 tail -n 1`                 #
+
+    SUCCESS="NOTYET"
+    for GITREPOBASEURL in $GITREPOBASEURLS
+     do GITRAWURL=`validateUrl ${GITREPOBASEURL}/raw/${HASH}/${GITFILEPATH}`
+        if [ "$GITRAWURL" != "" ] &&
+           [ "$SUCCESS" == "NOTYET" ] || [ "$SHOWALL" != "" ]
+         then SUCCESS="YES"
+              echo $GITRAWURL
+        fi
+    done
+
+   )
+
+  }
+# --------------------------------------------------------------------------- #
