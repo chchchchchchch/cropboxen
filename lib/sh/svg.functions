@@ -63,14 +63,6 @@
 
   }
 # --------------------------------------------------------------------------- #
-  function svgGetLayerSetup() { # VISIBILITY ACCORDING TO LAYER ORDER
-
-  ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
-
-  )
-
-  }
-# --------------------------------------------------------------------------- #
   function svgGetDimensions() { # VISIBILITY ACCORDING TO LAYER ORDER
 
   ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
