@@ -130,7 +130,7 @@
                      head -n 1       | #
                      cut -d '"' -f 2 | #
                      cut -d ":" -f 2`  #
-         if [ "$VISIBILITY" = "inline" ];then V="1";else V="0";fi
+         if [ "$VISIBILITY" = "none" ];then V="0";else V="1";fi
          LAYERNAME=`echo $LAYER                | #
                     sed "s/$B/\n/g"            | #
                     sed "s/$S/ /g"             | #
