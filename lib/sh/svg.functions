@@ -208,16 +208,19 @@
        [ ! -f "$SVG" ];then echo "PLEASE PROVIDE INPUT FILE";fi
     if [ "$OUT" == "$SVG" ];then echo "PLEASE PROVIDE OUTPUT FILE";fi
     if [ -f "$SVG" ]
-     then
-          python $APPLYTRANSFORMPY ${SVG} | #
-          sed 's/<\/*g[^>]*>//g' > ${TMP}.svg
-          scour -i ${TMP}.svg           \
+     then 
+          inkscape --export-text-to-path \
+                   --export-pdf=${TMP}.1.pdf $SVG
+          inkscape --export-plain-svg=${TMP}.1.svg ${TMP}.1.pdf
+          python $APPLYTRANSFORMPY ${TMP}.1.svg | #
+          sed 's/<\/*g[^>]*>//g' > ${TMP}.2.svg
+          scour -i ${TMP}.2.svg         \
                 --enable-viewboxing      \
                 --enable-id-stripping     \
                 --enable-comment-stripping \
                 --shorten-ids --indent=none \
                 -o $OUT > /dev/null 2>&1 
-          rm ${TMP}.svg
+          rm ${TMP}.1.svg ${TMP}.2.svg ${TMP}.1.pdf
     fi
 
    )
