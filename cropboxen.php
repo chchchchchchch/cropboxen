@@ -273,13 +273,11 @@
  </script>
  <script src="cropboxen.js"></script>
 </head>
-<body>
+<body style="background-color:<?php echo $bgColor; ?>;">
 <div class="svg" id="svg">
 <div class="layer">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      width="100%" viewBox="0 0 <?php echo $svgWdth." ".$svgHght;?>" id="fillBackground">
-<rect x="0" y="0" width="<?php echo $svgWdth; ?>" height="<?php echo $svgHght; ?>" 
-      fill="<?php echo $bgColor; ?>" fill-opacity="0.4" stroke="none"></rect>
 </svg></div>
 <?php foreach ($layers as $liD => $layerConf) {
 
