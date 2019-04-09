@@ -37,6 +37,7 @@
    do EXPANDURLS="$EXPANDURLS "`expandUrl $URL`
   done
   GITREMOTEBASEURLS="$EXPANDURLS"
+  GITREMOTEBASEURLONE=`echo $GITREMOTEBASEURLS | sed 's/ /\n/g' | head -n 1`
 # --------------------------------------------------------------------------- #
   cd $GITROOTPATH # CHANGE INTO GIT ROOT PATH
 # --------------------------------------------------------------------------- #
@@ -53,34 +54,101 @@
               grep "^${GITSUBPATH}" | # ??????? WORKING ??????
               grep ".svg$"          | #
               sort -u`                #
-   do BASENAME=`echo $SVG | md5sum | cut -c 1-12`
-      echo -e "\n$SVG"
+   do #echo -e "\n$SVG"
+      SVGDIR="$OUTDIR/"`echo $GITREMOTEBASEURLONE$SVG | #
+                        md5sum | cut -c 1-6`            # 
+      if [ ! -d $SVGDIR ];then mkdir $SVGDIR;fi
+  # ----------------------------------------------------------------------- #
      (IFS=$'\n';
+  # ----------------------------------------------------------------------- #
       for COMMIT in `git log --all --pretty="%h:%ct:%s" -- $SVG | tac`
        do echo $COMMIT
           HASH=`echo $COMMIT | cut -d ":" -f 1`
-#         SVGOUT="${OUTDIR}/${BASENAME}_${HASH}.svg"
+          TIME=`echo $COMMIT | cut -d ":" -f 2`
+         #HUMANTIME=`date -d @$TIME +%d.%m.%y" "%H:%M`
+          TIMESTAMP=`date -d @$TIME +%y%m%d%H%M%S`
+          MESSAGE=`echo $COMMIT | cut -d ":" -f 3-`
+          SVGID="$TIMESTAMP"
+          SVGINFO="$SVGDIR/${SVGID}.txt"
         # ------------------------------------------------------------ #
-#         getGitRawUrl -a $GITREMOTEBASEURLS $HASH $SVG
+          TMPSVG="${TMP}.${TIMESTAMP}.svg"
         # ------------------------------------------------------------ #
-#         git show ${HASH}:${SVG} > $SVGOUT
+          GITURLS=`getGitRawUrl -a $GITREMOTEBASEURLS $HASH $SVG | #
+                   sed 's/^/GITURL:/'`
         # ------------------------------------------------------------ #
-#         svgHasImg $SVGOUT
-#       # ------------------------------------------------------------ #
-#         cat $SVGOUT | sed 's/display:none//g' > ${TMP}.svg
-#         inkscape --export-area-drawing \
-#                  --export-png=${SVGOUT}.png \
-#                 ${TMP}.svg > /dev/null 2>&1
-#         VHASH=`md5sum ${SVGOUT}.png | cut -d " " -f 1`
-#         if [ "$VHASH" != "$PREVVHASH" ]
-#         then sleep 0
-#         else echo "NO VISUAL CHANGES"
-#              rm $SVGOUT
-#         fi
-#         PREVVHASH="$VHASH"
-#       # ------------------------------------------------------------ #
+          git show ${HASH}:${SVG} > $TMPSVG
+        # ------------------------------------------------------------ #
+          cat $TMPSVG | sed 's/display:none//g' > ${TMP}.svg
+          inkscape --export-area-drawing \
+                   --export-png=${TMP}.png \
+                  ${TMP}.svg > /dev/null 2>&1
+          VHASH=`md5sum ${TMP}.png | cut -d " " -f 1`
+        # ============================================================ #
+          if [ "$VHASH" != "$PREVVHASH" ]
+          then
+        # ------------------------------------------------------------ #
+          echo $GITURLS | sed 's/ /\n/g'                   >  $SVGINFO
+        # ------------------------------------------------------------ #
+          echo "COMMITMESSAGE:$MESSAGE"                    >> $SVGINFO
+        # ------------------------------------------------------------ #
+          echo "# STATUS:TIMESTAMP:ID:X:Y:W:H"  > $SVGDIR/${SVGID}.bxn
+        # ------------------------------------------------------------ #
+          AREA=`svgGetDimensions $TMPSVG`
+          MAX=`echo $AREA | cut -d ":" -f 3,4 | #
+               sed 's/:/\n/' | sort -n | tail -n 1`
+          MARGIN=`python -c "print $MAX / 100 * 10" | cut -d "." -f 1`
+          C=1;AREAPLUS=""
+          for V in `echo $AREA | sed 's/:/\n/g'`
+           do   if [ "$C" -le 2 ]
+                then V=`expr $V - $MARGIN / 2`
+                else V=`expr $V + $MARGIN`
+                fi
+                C=`expr $C + 1`
+                AREAPLUS="${AREAPLUS}:$V"
+          done; AREAPLUS=`echo $AREAPLUS | sed 's/^://'`
+          AREA="$AREAPLUS"
+          echo "AREA:$AREA"                                >> $SVGINFO
+        # ------------------------------------------------------------ #
+          sed 's/pagecolor="[^"]*"/\n&\n/' $TMPSVG | #
+          grep "^pagecolor" | cut -d '"' -f 2 | head -n 1 | #
+          sed 's/^/BGCOLOR:/' >> $SVGINFO
+        # ------------------------------------------------------------ #
+          svgLayers2Files $TMPSVG $SVGDIR/$SVGID
+        # ------------------------------------------------------------ #
+          for SVGLAYER in `ls $SVGDIR/${SVGID}*.svg`
+           do #echo $SVGLAYER
+              LAYERNAME=`cat $SVGLAYER | #
+                         sed 's/inkscape:label="[^"]*"/\n&\n/' | #
+                         grep "^inkscape:label" | cut -d '"' -f 2 | #
+                         head -n 1`
+              LAYERNAMEID=`echo $SVGLAYER | rev | #
+                           cut -d "_" -f 1 | rev | #
+                           sed 's/\.svg$//'`       #
+              echo "$LAYERNAMEID:$LAYERNAME" >> $SVGINFO
+              svgCropArea $SVGLAYER ${SVGLAYER%%.*}_CROP.svg $AREA
+              svgBake ${SVGLAYER%%.*}_CROP.svg $SVGLAYER
+              rm ${SVGLAYER%%.*}_CROP.svg
+          done
+        # ------------------------------------------------------------ #
+          sed 's/viewBox="[^"]*"/\n&\n/' $SVGDIR/${SVGID}*.svg | #
+          grep "^viewBox" | head -n 1 | #
+          cut -d '"' -f 2 | cut -d " " -f 3 | #
+          sed 's/^/W:/' >> $SVGINFO
+        # ----
+          sed 's/viewBox="[^"]*"/\n&\n/' $SVGDIR/${SVGID}*.svg | #
+          grep "^viewBox" | head -n 1 | #
+          cut -d '"' -f 2 | cut -d " " -f 4 | #
+          sed 's/^/H:/' >> $SVGINFO
+        # ------------------------------------------------------------ #
+        # ============================================================ #
+          else echo "NO VISUAL CHANGES"
+               rm ${TMPSVG}
+          fi
+          PREVVHASH="$VHASH"
+        # ============================================================ #
 
       done;)
+  # ----------------------------------------------------------------------- #
   # TODO: IF NOT TRACKED
   done
 # --------------------------------------------------------------------------- #
