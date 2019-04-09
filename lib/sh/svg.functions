@@ -23,7 +23,11 @@
 # --------------------------------------------------------------------------- #
   function svgRmImage() {
 
-  ( DUMMYSTYLE='style="fill:#ffff99;stroke:none"'
+  ( XLINKID="xlink:href"
+    DUMMYIMG="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAAC
+              Qd1PeAAAAA3NCSVQICAjb4U/gAAAADElEQVQImWP4z8AAAAMBAQCc479ZAAAA
+              AElFTkSuQmCC"
+    DUMMYIMG=`echo $DUMMYIMG | sed 's/ //g'`
 
     SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
     OUT=`echo $* | sed 's/ /\n/' | grep "svg$" | tail -n 1`
@@ -31,11 +35,22 @@
        [ ! -f "$SVG" ];then echo "PLEASE PROVIDE INPUT FILE";fi
     if [ "$OUT" == "$SVG" ];then echo "PLEASE PROVIDE OUTPUT FILE";fi
     if [ -f "$SVG" ] && [ "$OUT" != "" ]
-     then
-          sed "s/<image/<rect $DUMMYSTYLE/g" $SVG   | # REPLACE IMAGE WITH RECT
-          sed '/^[ \t]*xlink:href="[^"]*"[ \t]*$/d' | # RM LINES WITH XLINK ONLY
-          sed 's/xlink:href="[^"]*"//g'             | # RM XLINK 
-          tee > $OUT                                  # WRITE TO FILE
+     then cp $SVG $OUT
+          for XLINK in `cat $SVG      | #
+                        sed "s/ /\n/g" | #
+                        grep "$XLINKID" | #
+                        grep -v '="#'    | #
+                        grep -v 'data:image/png;base64'`
+           do
+              IMGSRC=`echo $XLINK         | # START WITH XLINKG
+                      cut -d "\"" -f 2    | # SELECT IN QUOTATION
+                      sed "s/$XLINKID//g" | # RM XLINK
+                      sed 's,file://,,g'`   # RM file://
+              NEWXLINK="deadxlink=\"$IMGSRC\""
+              FOO="xlink:href=\"$DUMMYIMG\""
+              X="$XLINK";NX="$NEWXLINK"
+              sed -i "s|\(^[ ]*\)\($X\)|\1$FOO\n\1$NX|g" $OUT
+          done
     fi
 
    )
