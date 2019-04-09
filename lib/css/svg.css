@@ -32,10 +32,10 @@ div.svg > .layer { position:absolute;
 .showmdsh { position:absolute;
             left:2vw;bottom:2vw;z-index:500001;
             width:75vw;height:50px;
-            background-color:#ff0000;
+            background-color:none;
 }
-.showmdsh > textarea { width:100%;height:100%;
-                       padding:0.5em;
+.showmdsh > textarea { width:97%;height:100%;
+                       padding:1.5%;
                        word-wrap: break-word;
                        word-break: break-all;
                        resize:none;
