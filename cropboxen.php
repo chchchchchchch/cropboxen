@@ -42,22 +42,23 @@
           $vBasePath = $srcBasePath . "/" . $srcID . "/" .$viD;
 
           if ( file_exists($vBasePath . ".txt")) {
+           $file = $vBasePath . ".bxn";
 
-            $file = $vBasePath . ".bxn";
-            $timestamp = round(microtime(true) * 1000);
-  
-            if ( $flag == "A" ) {
-                  $write = $flag.":".$timestamp.":".$id.":".$area;
-            } else if ( $flag == "D" ) {
-                         $write = $flag.":".$timestamp.":".$id; 
+            if ( file_exists($file) && is_writeable($file) ) {
+                 $timestamp = round(microtime(true) * 1000);
+                 if ( $flag == "A" ) {
+                       $write = $flag.":".$timestamp.":".$id.":".$area;
+                 } else if ( $flag == "D" ) {
+                              $write = $flag.":".$timestamp.":".$id; 
+                 }
+                 $f = fopen($file, "a"); // APPEND
+                 fwrite($f,$write."\n");
+                 // Close the text file
+                 fclose($f);
             }
 
-            $f = fopen($file, "a"); // APPEND
-            fwrite($f,$write."\n");
-            // Close the text file
-            fclose($f);
-
           }
+
         }
       }
 
@@ -171,10 +172,12 @@
   // -------------------------------------------------------------------- //
      function loadConfig($vBasePath) {
 
+       if ( file_exists($vBasePath.".txt") ) {
+
          $configFile = array_values(
                         array_filter(
                          file($vBasePath.".txt"),"trim" ) );
-    
+
          $confLoad = array();
          foreach($configFile as $line) {
        
@@ -182,13 +185,16 @@
             $val = trim(implode(":",array_slice(explode(':',$line),1)));
             $confLoad[$key] = $val;
 
-         }
+         } return $confLoad;
 
-         return $confLoad;
+       } else { echo "CONFIG FILE MISSING. EXITING."; exit;  }
+
      }
   // -------------------------------------------------------------------- //
      function loadCropBoxes($boxlist) {
  
+      if ( file_exists($boxlist) ) {
+
         $list = array_values(array_filter(file($boxlist),"trim"));
  
        // GET FLAG/DATE FOR EACH HASH (=KEY)
@@ -219,6 +225,8 @@
           asort($select);
  
         return $select;
+
+      }
      }
   // -------------------------------------------------------------------- //
      function humanTime($timestamp) {  
@@ -305,22 +313,24 @@
      width="100%" viewBox="0 0 <?php echo $svgWdth." ".$svgHght;?>"
      id="showCropBoxes">
 <?php $cropBoxes = loadCropBoxes($boxList);
-      foreach ($cropBoxes as $id => $area) {
-
-               $x = trim(explode(':',$area)[0]);
-               $y = trim(explode(':',$area)[1]);
-               $w = trim(explode(':',$area)[2]);
-               $h = trim(explode(':',$area)[3]);
-
-               echo '  <rect id="'      . $id . '"' .
-                            ' x="'      . $x  . '"' .
-                            ' y="'      . $y  . '"' .
-                            ' width="'  . $w  . '"' .
-                            ' height="' . $h  . '"' .
-                            ' class="croparea"' .
-                            ' onclick="editCropBox(this)"' .
-                            ' onmouseover="showCropBox(this)">' . 
-                            '</rect>' . "\n";
+      if ( isset($cropBoxes) ) {
+           foreach ($cropBoxes as $id => $area) {
+     
+                    $x = trim(explode(':',$area)[0]);
+                    $y = trim(explode(':',$area)[1]);
+                    $w = trim(explode(':',$area)[2]);
+                    $h = trim(explode(':',$area)[3]);
+     
+                    echo '  <rect id="'      . $id . '"' .
+                                 ' x="'      . $x  . '"' .
+                                 ' y="'      . $y  . '"' .
+                                 ' width="'  . $w  . '"' .
+                                 ' height="' . $h  . '"' .
+                                 ' class="croparea"' .
+                                 ' onclick="editCropBox(this)"' .
+                                 ' onmouseover="showCropBox(this)">' . 
+                                 '</rect>' . "\n";
+           }
       }
 ?>
 </svg></div>
