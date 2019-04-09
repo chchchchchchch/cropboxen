@@ -107,7 +107,8 @@
 
       $viD = strip_tags(trim($_GET['v'])); // TODO: DIFFERENT FORMATS/VERIFY
 
-     }
+     } else { $viD = "X"; }
+
      $vConf   = $srcBasePath . "/" . $srcID . "/" . $viD . ".txt";
   // -------------------------------------------------------------------- //
      if ( !file_exists($vConf) ) {
