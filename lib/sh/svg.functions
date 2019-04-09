@@ -83,13 +83,13 @@
   function svgGetDimensions() { # VISIBILITY ACCORDING TO LAYER ORDER
 
   ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
-  
-      AREA=`inkscape -S $SVG 2> /dev/null   | #
-            head -n 1 | cut -d "," -f 2-    | #
-            sed 's/\(\.[0-9]*\)\(\b\)/\2/g' | #
-            sed 's/,/:/g'`
-      echo $AREA
-
+    sed 's/display:none/display:inline/g' $SVG > ${TMP}.svg 
+    AREA=`inkscape -S ${TMP}.svg 2> /dev/null | #
+          head -n 1 | cut -d "," -f 2-        | #
+          sed 's/\(\.[0-9]*\)\(\b\)/\2/g'     | #
+          sed 's/,/:/g'`
+    echo $AREA
+    rm ${TMP}.svg
   )
 
   }
