@@ -160,10 +160,11 @@
                 $layerName = getValue($conf,$liD,'LAYER NAME MISSING');
                 $visibility = rtrim(substr($layerFile,-12,1));
                 $zIndex = substr($count,-4);
-                $layers[$liD] = array('layerfile'  => $layerFile,
-                                      'layername'  => $layerName,
-                                      'zindex'     => $zIndex,
-                                      'visibility' => $visibility);
+                $layers[$count] = array('liD'        => $liD,
+                                        'layerfile'  => $layerFile,
+                                        'layername'  => $layerName,
+                                        'zindex'     => $zIndex,
+                                        'visibility' => $visibility);
                 $count++;
       }
 
@@ -287,14 +288,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      width="100%" viewBox="0 0 <?php echo $svgWdth." ".$svgHght;?>" id="fillBackground">
 </svg></div>
-<?php foreach ($layers as $liD => $layerConf) {
+<?php foreach ($layers as $cnt => $layerConf) {
 
-               $layerFile  = $layers[$liD]['layerfile'];
-               $visibility = $layers[$liD]['visibility'];
+               $liD        = $layers[$cnt]['liD'];
+               $layerFile  = $layers[$cnt]['layerfile'];
+               $visibility = $layers[$cnt]['visibility'];
                if ( $visibility == 0 ) {
                       $display = "display:none";
                } else { $display = ""; }
-               $zIndex     = $layers[$liD]['zindex']; 
+               $zIndex     = $layers[$cnt]['zindex']; 
 
                echo '<div class="layer src ' . 
                      $liD . 
@@ -337,10 +339,11 @@
 </div>
 <div id="viewport" style="position:fixed;width:100vw;height:100vh;z-index:100000"></div>
 <div id="layercontrol">
-<?php foreach ($layers as $liD => $layerConf) {
+<?php foreach ($layers as $cnt => $layerConf) {
 
-               $layerName = $layers[$liD]['layername'];
-               $visibility = $layers[$liD]['visibility'];
+               $liD        = $layers[$cnt]['liD'];
+               $layerName  = $layers[$cnt]['layername'];
+               $visibility = $layers[$cnt]['visibility'];
                if ( $visibility == 0 ) {
                       $checked = "";
                } else { $checked = 'checked="checked"'; }
