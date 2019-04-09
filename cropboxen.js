@@ -283,6 +283,18 @@
       });
 
    }
+// ------------------------------------------------------------------------- //   
+   function saveView() { // TODO
+      //console.log("saveView");
+      //pzSave = $('#svg').attr("style");
+      //console.log(pzSave);
+   }
+// ------------------------------------------------------------------------- //   
+   function loadView() { // TODO
+      //console.log("loadView");
+      //pzLoad = "transform-origin:0px 0px 0px;transform:matrix(1.71744,0,0,1.71744,-321.793,-1938.65);"
+      //$('#svg').attr("style",pzLoad);
+   }
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizing = false;
                             popSelection();
@@ -318,8 +330,8 @@
 // ------------------------------------------------------------------------- //
      window.addEventListener("keydown", function(e) {
       // console.log(e.keyCode);
-      // space and arrow keys and return and tab
-      if([32,37,38,39,40,13,9].indexOf(e.keyCode) > -1) {
+      // space and arrow keys and return and tab and s and l
+      if([32,37,38,39,40,13,9,83,76].indexOf(e.keyCode) > -1) {
           e.preventDefault();
       }
      }, false); 
@@ -328,6 +340,8 @@
 
        keyCode = e.keyCode || e.which;
 
+       if ( keyCode == 83) { saveView(); }
+       if ( keyCode == 76) { loadView(); }
        if ( keyCode == 9 && editMode != true ) {
 
             editMode = true;
