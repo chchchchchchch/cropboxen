@@ -79,6 +79,7 @@
    $("#switchversion").change(function(){ 
      window.location = "?v=" + this.value + "&show=" + srcID;
    });
+   $("#switchversion").mouseup(function(event){$(this).blur()});
 // ------------------------------------------------------------------------- //
    })
 // ========================================================================= //
