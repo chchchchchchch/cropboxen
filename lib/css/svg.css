@@ -58,7 +58,7 @@ div.svg > .layer { position:absolute;
 
 #versions { position:absolute;
             right:2vw;top:5px;z-index:500002;
-            width:18vw;height:40px;
+            width:18vw;height:20px;
 }
 
 #versions > select { width:100%; }
