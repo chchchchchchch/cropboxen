@@ -83,18 +83,9 @@
   function svgGetDimensions() { # VISIBILITY ACCORDING TO LAYER ORDER
 
   ( SVG=`echo $* | sed 's/ /\n/' | grep "svg$" | head -n 1`
-
-    # THIS COULD BE DONE BETTER (?!)
-    # ------------------------------
-    # X=`inkscape -X $SVG | cut -d "." -f 1`
-    # Y=`inkscape -Y $SVG | cut -d "." -f 1`
-    # W=`inkscape -W $SVG | cut -d "." -f 1`
-    # H=`inkscape -H $SVG | cut -d "." -f 1`
-    # echo "$X:$Y:$W:$H"
   
-      AREA=`inkscape -S $SVG | #
-            head -n 1        | #
-            cut -d "," -f 2- | #
+      AREA=`inkscape -S $SVG 2> /dev/null   | #
+            head -n 1 | cut -d "," -f 2-    | #
             sed 's/\(\.[0-9]*\)\(\b\)/\2/g' | #
             sed 's/,/:/g'`
       echo $AREA
