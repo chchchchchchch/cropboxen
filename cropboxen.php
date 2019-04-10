@@ -126,10 +126,11 @@
      }
   // -------------------------------------------------------------------- //
      $versions = getVersions($srcBasePath."/".$srcID); // TODO: CHECK
-     $boxList = $srcBasePath . "/" . $srcID . "/" . $viD . ".bxn";
+     $boxList  = $srcBasePath . "/" . $srcID . "/" . $viD . ".bxn";
+     $viewList = $srcBasePath . "/" . $srcID . "/" . $viD . ".views";
   // -------------------------------------------------------------------- //
-     $conf = loadConfig($srcBasePath."/".$srcID."/".$viD);
-     $layers = getLayers($srcBasePath."/".$srcID."/".$viD,$conf);
+     $conf    = loadConfig($srcBasePath."/".$srcID."/".$viD);
+     $layers  = getLayers($srcBasePath."/".$srcID."/".$viD,$conf);
 
      $svgWdth = getValue($conf,'W','REQUIRED');
      $svgHght = getValue($conf,'H','REQUIRED');
@@ -164,7 +165,7 @@
                 $layers[$count] = array('liD'        => $liD,
                                         'layerfile'  => $layerFile,
                                         'layername'  => $layerName,
-                                        'zindex'     => $zIndex,
+                                        'zindex'     => $zIndex,                                        
                                         'visibility' => $visibility);
                 $count++;
       }
@@ -231,6 +232,58 @@
       }
      }
   // -------------------------------------------------------------------- //
+     function loadViews($viewlist) {
+ 
+      if ( file_exists($viewlist) ) {
+
+        $list = array_values(array_filter(file($viewlist),"trim"));
+ 
+       // GET FLAG/DATE FOR EACH HASH (=KEY)
+       // OVERWRITE ITEM => HAS LATEST STATE/DATE
+          $unify = array();
+          foreach($list as $line) {
+                  $flag = rtrim(substr($line,0,1));
+                  if ( $flag != '#' ) {
+                       $date = rtrim(substr($line,2,13));
+                       $hash = rtrim(substr($line,16,11));
+                       $rest = rtrim(substr($line,28));
+                       $zoom = explode(':',$rest)[0];
+                       $panx = explode(':',$rest)[1];
+                       $pany = explode(':',$rest)[2];
+                       $lyrs = '"'.explode(':',$rest)[3].'"';
+
+                       $unify[$hash] = array('flag' => $flag,
+                                             'date' => $date,
+                                             'zoom' => $zoom,
+                                             'panx' => $panx,
+                                             'pany' => $pany,
+                                             'lyrs' => $lyrs);
+                 }
+          }
+ 
+       // SELECT/SORT 
+          $select = array();
+          foreach($unify as $key => $item) {
+             $flag = $item['flag'];
+             $date = $item['date'];
+             $zoom = $item['zoom'];
+             $panx = $item['panx'];
+             $pany = $item['pany'];
+             $lyrs = $item['lyrs'];
+             if ( $flag != 'D' ) {
+             $select[$key] = array('zoom' => $zoom,
+                                   'panx' => $panx,
+                                   'pany' => $pany,
+                                   'lyrs' => $lyrs);
+             }
+          }
+          asort($select);
+ 
+        return $select;
+
+      }
+     }
+  // -------------------------------------------------------------------- //
      function humanTime($timestamp) {  
 
 
@@ -282,6 +335,15 @@
                             $comma = ",\n                           ";
                          }
                          ?> }
+<?php $views = loadViews($viewList);
+      if ( isset($views) ) { ?>
+
+        $(document).ready(function(){loadView(<?php $comma="";
+                                               foreach ($views[array_rand($views)] as $value)
+                                                { echo $comma.$value;$comma=","; }
+                                               ?>);});
+
+<?php } ?>
  </script>
  <script src="cropboxen.js"></script>
 </head>
