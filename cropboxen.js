@@ -20,7 +20,7 @@
 // ------------------------------------------------------------------------- //
    windowWidth = $(window).width();
    svgScale = $('div#svg').width() / svgWidth;
-   visibleLayers(); // INIT
+   visibleLayerNames(); // INIT
 // ------------------------------------------------------------------------- //
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
@@ -269,7 +269,7 @@
 // ------------------------------------------------------------------------- //
    function visibleLayers() { // https://stackoverflow.com/questions/1965075
 
-     vLList = ""
+     vLList = "";
      $('div#layercontrol > input[type=checkbox]').each(function () {
          var lThisVal = (this.checked ? "1" : "0");
          vLList += (vLList=="" ? lThisVal : + lThisVal);
