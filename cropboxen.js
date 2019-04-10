@@ -284,18 +284,48 @@
 // ------------------------------------------------------------------------- //   
    function saveView() { // TODO
 
-     //viewCenterX = 0; // TODO
-     //viewCenterY = 0; // TODO
+       canvasWidth = $('div#svg').width();
+       svgScale = canvasWidth / svgWidth;
 
+/*
+       loadPanX = panZoom.getTransform().x; 
+       loadPanY = panZoom.getTransform().y;
+
+       canvasCenterX = (loadPanX * -1 + $(window).width()/100*80 / 2)  / 2;
+       canvasCenterY = (loadPanY * -1 + $(window).height()/100*90 / 2) / 2;
+
+       viewCenterX = Math.round(canvasCenterX / svgScale);
+       viewCenterY = Math.round(canvasCenterY / svgScale);
+
+       console.log("saveView");
+       console.log("loadPanX: " + loadPanX + " " +
+                   "loadPanY: " + loadPanY);
+       console.log("canvasCenterX: " + canvasCenterX + " " +
+                   "canvasCenterY: " + canvasCenterY);
+*/
+
+       viewCenterX = Math.round((panZoom.getTransform().x*-1 
+                                + $(window).width()/100*80/2)/2/svgScale);
+       viewCenterY = Math.round((panZoom.getTransform().y*-1 
+                                + $(window).height()/100*90/2)/2/svgScale);
+
+
+       console.log("viewCenterX: " + viewCenterX + " " +
+                   "viewCenterY: " + viewCenterY);
+       console.log("");
 
    }
 // ------------------------------------------------------------------------- //   
    function loadView() { // TODO
 
+       viewCenterX = 755; // POS + MARGIN
+       viewCenterY = 535; // POS + MARGIN
+
        canvasWidth = $('div#svg').width();
        svgScale = canvasWidth / svgWidth;
-       canvasCenterX = svgWidth*svgScale/2;
-       canvasCenterY = svgHeight*svgScale/2;
+
+       canvasCenterX = Math.round(viewCenterX * svgScale);
+       canvasCenterY = Math.round(viewCenterY * svgScale);
 
        $('#svg').removeAttr("style");
        panZoom = panzoom(document.getElementById('svg'));
@@ -306,13 +336,22 @@
        });
        panZoom.pause();
 
-       loadZoom = 2;
-       loadPanX = (canvasCenterX * 2)
-                - ($(window).width()/100*80)/2;
-       loadPanY = (canvasCenterY * 2)
-                - ($(window).height()/100*90)/2;
+       loadZoom = 2;               // | 'VIEW AREA'  AS  IN  CSS  | //
+       loadPanX = canvasCenterX * 2 - $(window).width()  / 100 * 80  / 2;
+       loadPanY = canvasCenterY * 2 - $(window).height() / 100 * 90  / 2;
 
        panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
+
+//     console.log("loadView");
+       console.log("viewCenterX: " + viewCenterX + " " +
+                   "viewCenterY: " + viewCenterY);
+/*
+       console.log("canvasCenterX: " + canvasCenterX + " " +
+                   "canvasCenterY: " + canvasCenterY);
+       console.log("loadPanX: " + loadPanX + " " +
+                   "loadPanY: " + loadPanY);
+       console.log("");
+*/
 
    }
 // ------------------------------------------------------------------------- //
