@@ -330,16 +330,6 @@
       layersVisible = visibleLayers();
       thisView = viewZoom+":"+viewCenterX+":"+viewCenterY+":"+layersVisible;
 
-      console.log(thisView);
-
-/*
-      console.log("SAVE VIEW");
-      console.log("viewCenterX: " + viewCenterX + " " +
-                  "viewCenterY: " + viewCenterY + " " +
-                  "viewZoom: " + viewZoom);
-      console.log("");
-*/
-
    }
 // ------------------------------------------------------------------------- //   
    function loadView() { // TODO
@@ -368,15 +358,6 @@
       loadPanY = Math.round(canvasCenterY);
 
       panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
-
-/*    console.log("LOAD VIEW");
-      console.log("loadPanX: " + loadPanX + " " +
-                  "loadPanY: " + loadPanY + " " +
-                  "loadZoom: " + loadZoom);
-*//*  console.log("viewCenterX: " + viewCenterX + " " +
-                  "viewCenterY: " + viewCenterY + " " +
-                  "loadZoom: " + loadZoom); */
-//    console.log("");
 
    }
 // ------------------------------------------------------------------------- //
