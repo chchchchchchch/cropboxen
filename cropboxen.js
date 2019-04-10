@@ -70,7 +70,6 @@
              $(this).hide();
           });   
        }
-
        visibleLayerNames();
      });
 // ------------------------------------------------------------------------- //
@@ -293,6 +292,28 @@
 
    }
 // ------------------------------------------------------------------------- //   
+   function toggleLayers(layerCode) {
+
+     var i = 0;
+     $('.layerSwitch').each(function () {
+        if ( layerCode.charAt(i) == 0 ) {
+                 $(this).prop( "checked",false);
+         } else { $(this).prop( "checked",true);
+        }
+       i++;
+     });
+
+     var i = 0;
+     $('.layer.src').each(function () {
+        if ( layerCode.charAt(i) == 0 ) {
+                 $(this).hide();
+         } else { $(this).show(); 
+        }
+       i++;
+     });
+
+   }
+// ------------------------------------------------------------------------- //   
    function saveView() { // TODO
 
       svgScale = $('div#svg').width() / svgWidth;
@@ -327,6 +348,8 @@
       viewCenterX = 525;
       viewCenterY = 587;
 
+      toggleLayers("001");
+
       svgScale = $('div#svg').width() / svgWidth;
 
       canvasCenterX = Math.round(viewCenterX * svgScale);
@@ -350,11 +373,10 @@
       console.log("loadPanX: " + loadPanX + " " +
                   "loadPanY: " + loadPanY + " " +
                   "loadZoom: " + loadZoom);
-*/    console.log("viewCenterX: " + viewCenterX + " " +
+*//*  console.log("viewCenterX: " + viewCenterX + " " +
                   "viewCenterY: " + viewCenterY + " " +
-                  "loadZoom: " + loadZoom);
+                  "loadZoom: " + loadZoom); */
 //    console.log("");
-
 
    }
 // ------------------------------------------------------------------------- //
