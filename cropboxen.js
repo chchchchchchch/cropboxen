@@ -287,19 +287,39 @@
        canvasWidth = $('div#svg').width();
        svgScale = canvasWidth / svgWidth;
 
-       loadZoom = panZoom.getTransform().scale;
-       loadPanX = panZoom.getTransform().x / (loadZoom - 1) * -1; 
-       loadPanY = panZoom.getTransform().y / (loadZoom - 1) * -1;
+     //saveZoom = panZoom.getTransform().scale.toFixed(4);
+     //savePanX = Math.floor(panZoom.getTransform().x / (loadZoom - 1) * -1); 
+     //savePanY = Math.floor(panZoom.getTransform().y / (loadZoom - 1) * -1);
 
-       console.log("saveView");
-       console.log("loadPanX: " + loadPanX + " " +
-                   "loadPanY: " + loadPanY + " " +
-                   "loadZoom: " + loadZoom);
+     //console.log("savePanX: " + savePanX + " " +
+     //            "savePanY: " + savePanY + " " +
+     //            "saveZoom: " + saveZoom);
+
+       viewZoom = panZoom.getTransform().scale.toFixed(4);
+       viewCenterX = Math.floor(panZoom.getTransform().x 
+                                / (viewZoom - 1) * -1
+                               / svgScale); 
+       viewCenterY = Math.floor(panZoom.getTransform().y 
+                               / (viewZoom - 1) * -1
+                              / svgScale);
+
+       console.log("SAVE VIEW");
+       console.log("viewCenterX: " + viewCenterX + " " +
+                   "viewCenterY: " + viewCenterY + " " +
+                   "viewZoom: " + viewZoom);
        console.log("");
 
    }
 // ------------------------------------------------------------------------- //   
    function loadView() { // TODO
+
+       viewCenterX = 535; // POS + MARGIN
+       viewCenterY = 535; // POS + MARGIN
+
+       svgScale = $('div#svg').width() / svgWidth;
+
+       canvasCenterX = Math.round(viewCenterX * svgScale);
+       canvasCenterY = Math.round(viewCenterY * svgScale);
 
        $('#svg').removeAttr("style");
        panZoom = panzoom(document.getElementById('svg'));
@@ -310,15 +330,23 @@
        });
        panZoom.pause();
 
-       loadZoom = 15;
-       loadPanX = 800;
-       loadPanY = 100;
+       loadZoom = 10;
+     //loadPanX = 448;
+     //loadPanY = 481;
+       loadPanX = Math.round(canvasCenterX);
+       loadPanY = Math.round(canvasCenterY);
 
        panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
 
-       console.log("loadView");
+
+       console.log("LOAD VIEW");
+/*     console.log("canvasCenterX: " + canvasCenterX + " " +
+                   "canvasCenterX: " + canvasCenterY); */
        console.log("loadPanX: " + loadPanX + " " +
                    "loadPanY: " + loadPanY + " " +
+                   "loadZoom: " + loadZoom);
+       console.log("viewCenterX: " + viewCenterX + " " +
+                   "viewCenterY: " + viewCenterY + " " +
                    "loadZoom: " + loadZoom);
        console.log("");
 
