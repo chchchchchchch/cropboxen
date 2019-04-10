@@ -287,32 +287,10 @@
        canvasWidth = $('div#svg').width();
        svgScale = canvasWidth / svgWidth;
 
-/*
-       loadPanX = panZoom.getTransform().x; 
-       loadPanY = panZoom.getTransform().y;
-
-       canvasCenterX = (loadPanX * -1 + $(window).width()/100*80 / 2)  / 2;
-       canvasCenterY = (loadPanY * -1 + $(window).height()/100*90 / 2) / 2;
-
-       viewCenterX = Math.round(canvasCenterX / svgScale);
-       viewCenterY = Math.round(canvasCenterY / svgScale);
-
-       console.log("saveView");
-       console.log("loadPanX: " + loadPanX + " " +
-                   "loadPanY: " + loadPanY);
-       console.log("canvasCenterX: " + canvasCenterX + " " +
-                   "canvasCenterY: " + canvasCenterY);
-*/
-
        viewCenterX = Math.round((panZoom.getTransform().x*-1 
                                 + $(window).width()/100*80/2)/2/svgScale);
        viewCenterY = Math.round((panZoom.getTransform().y*-1 
                                 + $(window).height()/100*90/2)/2/svgScale);
-
-
-       console.log("viewCenterX: " + viewCenterX + " " +
-                   "viewCenterY: " + viewCenterY);
-       console.log("");
 
    }
 // ------------------------------------------------------------------------- //   
@@ -341,17 +319,6 @@
        loadPanY = canvasCenterY * 2 - $(window).height() / 100 * 90  / 2;
 
        panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
-
-//     console.log("loadView");
-       console.log("viewCenterX: " + viewCenterX + " " +
-                   "viewCenterY: " + viewCenterY);
-/*
-       console.log("canvasCenterX: " + canvasCenterX + " " +
-                   "canvasCenterY: " + canvasCenterY);
-       console.log("loadPanX: " + loadPanX + " " +
-                   "loadPanY: " + loadPanY);
-       console.log("");
-*/
 
    }
 // ------------------------------------------------------------------------- //
