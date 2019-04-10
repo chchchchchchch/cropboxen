@@ -287,23 +287,19 @@
        canvasWidth = $('div#svg').width();
        svgScale = canvasWidth / svgWidth;
 
-       viewCenterX = Math.round((panZoom.getTransform().x*-1 
-                                + $(window).width()/100*80/2)/2/svgScale);
-       viewCenterY = Math.round((panZoom.getTransform().y*-1 
-                                + $(window).height()/100*90/2)/2/svgScale);
+       loadZoom = panZoom.getTransform().scale;
+       loadPanX = panZoom.getTransform().x / (loadZoom - 1) * -1; 
+       loadPanY = panZoom.getTransform().y / (loadZoom - 1) * -1;
+
+       console.log("saveView");
+       console.log("loadPanX: " + loadPanX + " " +
+                   "loadPanY: " + loadPanY + " " +
+                   "loadZoom: " + loadZoom);
+       console.log("");
 
    }
 // ------------------------------------------------------------------------- //   
    function loadView() { // TODO
-
-       viewCenterX = 755; // POS + MARGIN
-       viewCenterY = 535; // POS + MARGIN
-
-       canvasWidth = $('div#svg').width();
-       svgScale = canvasWidth / svgWidth;
-
-       canvasCenterX = Math.round(viewCenterX * svgScale);
-       canvasCenterY = Math.round(viewCenterY * svgScale);
 
        $('#svg').removeAttr("style");
        panZoom = panzoom(document.getElementById('svg'));
@@ -314,11 +310,17 @@
        });
        panZoom.pause();
 
-       loadZoom = 2;               // | 'VIEW AREA'  AS  IN  CSS  | //
-       loadPanX = canvasCenterX * 2 - $(window).width()  / 100 * 80  / 2;
-       loadPanY = canvasCenterY * 2 - $(window).height() / 100 * 90  / 2;
+       loadZoom = 15;
+       loadPanX = 800;
+       loadPanY = 100;
 
        panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
+
+       console.log("loadView");
+       console.log("loadPanX: " + loadPanX + " " +
+                   "loadPanY: " + loadPanY + " " +
+                   "loadZoom: " + loadZoom);
+       console.log("");
 
    }
 // ------------------------------------------------------------------------- //
