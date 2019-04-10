@@ -14,6 +14,7 @@
    var cBList = [];
    var pendingRm = ""; // WAIT HERE BEFORE BEING REMOVED
 
+
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
@@ -28,7 +29,6 @@
                                                    rmCropBox(pendingRm);
                                                    pendingRm = ""; }
                           });
-
 // ------------------------------------------------------------------------- //
    panZoom = panzoom(document.getElementById('svg'));
    panZoom.on('transform', function(e) {
@@ -71,7 +71,7 @@
           });   
        }
 
-       visibleLayers();
+       visibleLayerNames();
      });
 // ------------------------------------------------------------------------- //
    $("#switchversion").change(function(){ 
@@ -266,8 +266,19 @@
      $('#showmdsh').val(mdshcode);
 
    }
-// ------------------------------------------------------------------------- //   
+// ------------------------------------------------------------------------- //
    function visibleLayers() { // https://stackoverflow.com/questions/1965075
+
+     vLList = ""
+     $('div#layercontrol > input[type=checkbox]').each(function () {
+         var lThisVal = (this.checked ? "1" : "0");
+         vLList += (vLList=="" ? lThisVal : + lThisVal);
+      });
+     return vLList;
+
+   }
+// ------------------------------------------------------------------------- //
+   function visibleLayerNames() {
 
      vLList = "";vLCount = 0
      $('div#layercontrol > input[type=checkbox]').each(function () {
@@ -284,71 +295,66 @@
 // ------------------------------------------------------------------------- //   
    function saveView() { // TODO
 
-       canvasWidth = $('div#svg').width();
-       svgScale = canvasWidth / svgWidth;
+      svgScale = $('div#svg').width() / svgWidth;
 
-     //saveZoom = panZoom.getTransform().scale.toFixed(4);
-     //savePanX = Math.floor(panZoom.getTransform().x / (loadZoom - 1) * -1); 
-     //savePanY = Math.floor(panZoom.getTransform().y / (loadZoom - 1) * -1);
-
-     //console.log("savePanX: " + savePanX + " " +
-     //            "savePanY: " + savePanY + " " +
-     //            "saveZoom: " + saveZoom);
-
-       viewZoom = panZoom.getTransform().scale.toFixed(4);
-       viewCenterX = Math.floor(panZoom.getTransform().x 
-                                / (viewZoom - 1) * -1
-                               / svgScale); 
-       viewCenterY = Math.floor(panZoom.getTransform().y 
+      viewZoom = panZoom.getTransform().scale.toFixed(3);
+      if (viewZoom==1){viewZoom=1.001;} // DIRTY!
+      viewCenterX = Math.floor(panZoom.getTransform().x 
                                / (viewZoom - 1) * -1
-                              / svgScale);
+                              / svgScale); 
+      viewCenterY = Math.floor(panZoom.getTransform().y 
+                              / (viewZoom - 1) * -1
+                             / svgScale);
 
-       console.log("SAVE VIEW");
-       console.log("viewCenterX: " + viewCenterX + " " +
-                   "viewCenterY: " + viewCenterY + " " +
-                   "viewZoom: " + viewZoom);
-       console.log("");
+      layersVisible = visibleLayers();
+      thisView = viewZoom+":"+viewCenterX+":"+viewCenterY+":"+layersVisible;
+
+      console.log(thisView);
+
+/*
+      console.log("SAVE VIEW");
+      console.log("viewCenterX: " + viewCenterX + " " +
+                  "viewCenterY: " + viewCenterY + " " +
+                  "viewZoom: " + viewZoom);
+      console.log("");
+*/
 
    }
 // ------------------------------------------------------------------------- //   
    function loadView() { // TODO
 
-       viewCenterX = 535; // POS + MARGIN
-       viewCenterY = 535; // POS + MARGIN
+      loadZoom = 2.85;
+      viewCenterX = 525;
+      viewCenterY = 587;
 
-       svgScale = $('div#svg').width() / svgWidth;
+      svgScale = $('div#svg').width() / svgWidth;
 
-       canvasCenterX = Math.round(viewCenterX * svgScale);
-       canvasCenterY = Math.round(viewCenterY * svgScale);
+      canvasCenterX = Math.round(viewCenterX * svgScale);
+      canvasCenterY = Math.round(viewCenterY * svgScale);
 
-       $('#svg').removeAttr("style");
-       panZoom = panzoom(document.getElementById('svg'));
-       panZoom.on('transform', function(e) {
-                   panX = panZoom.getTransform().x;
-                   panY = panZoom.getTransform().y;
-                   pzScale = panZoom.getTransform().scale;
-       });
-       panZoom.pause();
+      $('#svg').removeAttr("style");
+      panZoom = panzoom(document.getElementById('svg'));
+      panZoom.on('transform', function(e) {
+                  panX = panZoom.getTransform().x;
+                  panY = panZoom.getTransform().y;
+                  pzScale = panZoom.getTransform().scale;
+      });
+      panZoom.pause();
 
-       loadZoom = 10;
-     //loadPanX = 448;
-     //loadPanY = 481;
-       loadPanX = Math.round(canvasCenterX);
-       loadPanY = Math.round(canvasCenterY);
+      loadPanX = Math.round(canvasCenterX);
+      loadPanY = Math.round(canvasCenterY);
 
-       panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
+      panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
 
+/*    console.log("LOAD VIEW");
+      console.log("loadPanX: " + loadPanX + " " +
+                  "loadPanY: " + loadPanY + " " +
+                  "loadZoom: " + loadZoom);
+*/    console.log("viewCenterX: " + viewCenterX + " " +
+                  "viewCenterY: " + viewCenterY + " " +
+                  "loadZoom: " + loadZoom);
+//    console.log("");
 
-       console.log("LOAD VIEW");
-/*     console.log("canvasCenterX: " + canvasCenterX + " " +
-                   "canvasCenterX: " + canvasCenterY); */
-       console.log("loadPanX: " + loadPanX + " " +
-                   "loadPanY: " + loadPanY + " " +
-                   "loadZoom: " + loadZoom);
-       console.log("viewCenterX: " + viewCenterX + " " +
-                   "viewCenterY: " + viewCenterY + " " +
-                   "loadZoom: " + loadZoom);
-       console.log("");
 
    }
 // ------------------------------------------------------------------------- //
