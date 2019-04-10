@@ -336,9 +336,10 @@
 // ------------------------------------------------------------------------- //   
    function loadView(Z,X,Y,L) { // TODO
 
-      loadZoom = Z;
+      loadZoom    = Z;
       viewCenterX = X;
       viewCenterY = Y;
+
       toggleLayers(L);
 
       svgScale = $('div#svg').width() / svgWidth;
@@ -407,7 +408,7 @@
        keyCode = e.keyCode || e.which;
 
        if ( keyCode == 83) { saveView(); }
-       if ( keyCode == 76) { loadView(); }
+    /* if ( keyCode == 76) { loadView(); } */
        if ( keyCode == 9 && editMode != true ) {
 
             editMode = true;
