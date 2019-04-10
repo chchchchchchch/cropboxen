@@ -270,8 +270,9 @@
              var zeroX = <?php echo $zeroX; ?>; // srcOffsetX ???
              var zeroY = <?php echo $zeroY; ?>; // srcOffsetY ???
          var svgLayers = { <?php $comma ="";
-                            foreach ($layers as $liD => $layerConf) { 
-                                     $layerName = $layers[$liD]['layername'];
+                            foreach ($layers as $cnt => $layerConf) { 
+                                     $liD       = $layers[$cnt]['liD'];
+                                     $layerName = $layers[$cnt]['layername'];
                                      echo $comma     . 
                                          '"'         .
                                           $liD       . 
