@@ -32,11 +32,9 @@
 // ------------------------------------------------------------------------- //
    panZoom = panzoom(document.getElementById('svg'));
    panZoom.on('transform', function(e) {
-
-           panX = panZoom.getTransform().x;
-           panY = panZoom.getTransform().y;
-           pzScale = panZoom.getTransform().scale;
-
+               panX = panZoom.getTransform().x;
+               panY = panZoom.getTransform().y;
+               pzScale = panZoom.getTransform().scale;
    });
    panZoom.pause();
 // ------------------------------------------------------------------------- //
@@ -285,15 +283,37 @@
    }
 // ------------------------------------------------------------------------- //   
    function saveView() { // TODO
-      //console.log("saveView");
-      //pzSave = $('#svg').attr("style");
-      //console.log(pzSave);
+
+     //viewCenterX = 0; // TODO
+     //viewCenterY = 0; // TODO
+
+
    }
 // ------------------------------------------------------------------------- //   
    function loadView() { // TODO
-      //console.log("loadView");
-      //pzLoad = "transform-origin:0px 0px 0px;transform:matrix(1.71744,0,0,1.71744,-321.793,-1938.65);"
-      //$('#svg').attr("style",pzLoad);
+
+       canvasWidth = $('div#svg').width();
+       svgScale = canvasWidth / svgWidth;
+       canvasCenterX = svgWidth*svgScale/2;
+       canvasCenterY = svgHeight*svgScale/2;
+
+       $('#svg').removeAttr("style");
+       panZoom = panzoom(document.getElementById('svg'));
+       panZoom.on('transform', function(e) {
+                   panX = panZoom.getTransform().x;
+                   panY = panZoom.getTransform().y;
+                   pzScale = panZoom.getTransform().scale;
+       });
+       panZoom.pause();
+
+       loadZoom = 2;
+       loadPanX = (canvasCenterX * 2)
+                - ($(window).width()/100*80)/2;
+       loadPanY = (canvasCenterY * 2)
+                - ($(window).height()/100*90)/2;
+
+       panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
+
    }
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizing = false;
@@ -358,8 +378,8 @@
        }
 
        if ( editMode != true ) {
-
         if ( keyCode == 32 ) {
+
          if (  panZoom.isPaused() ) { 
                sArea.setOptions({disable:true})
                panZoom.resume();
