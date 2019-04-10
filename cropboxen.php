@@ -343,6 +343,15 @@
                                                 { echo $comma.$value;$comma=","; }
                                                ?>);});
 
+<?php } else { ?>
+    $(document).ready(function(){ panZoom = panzoom(document.getElementById('svg'));
+                                  panZoom.on('transform', function(e) {
+                                              panX = panZoom.getTransform().x;
+                                              panY = panZoom.getTransform().y;
+                                              pzScale = panZoom.getTransform().scale;
+                                  });
+                                  panZoom.pause() 
+                     });
 <?php } ?>
  </script>
  <script src="cropboxen.js"></script>

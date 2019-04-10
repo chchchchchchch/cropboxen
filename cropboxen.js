@@ -30,14 +30,6 @@
                                                    pendingRm = ""; }
                           });
 // ------------------------------------------------------------------------- //
-   panZoom = panzoom(document.getElementById('svg'));
-   panZoom.on('transform', function(e) {
-               panX = panZoom.getTransform().x;
-               panY = panZoom.getTransform().y;
-               pzScale = panZoom.getTransform().scale;
-   });
-   panZoom.pause();
-// ------------------------------------------------------------------------- //
    $('svg#showCropBoxes > rect').each(function () {
 
       cBList.push($(this).attr('id'));
