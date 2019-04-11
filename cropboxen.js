@@ -71,7 +71,7 @@
      $.redirect("?v=" + this.value + "&show=" + srcID, 
                {view:currentView,layers:"12345"},"POST","_self");
    });
-   $("#switchversion").mouseup(function(event){$(this).blur()});
+   //$("#switchversion").mouseup(function(event){$(this).blur()});
 // ------------------------------------------------------------------------- //
    })
 // ========================================================================= //
