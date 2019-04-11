@@ -314,6 +314,7 @@
  <script src="<?php echo $jsPath;?>jquery-3.3.1.js"></script>
  <script src="<?php echo $jsPath;?>jquery.imgareaselect.js"></script>
  <script src="<?php echo $jsPath;?>jquery.md5.js"></script>
+ <script src="<?php echo $jsPath;?>jquery.redirect.js"></script>
  <script src="<?php echo $jsPath;?>panzoom.js"></script>
  <script>      var viD = <?php echo '"' . $viD . '"'; ?>;
              var srcID = <?php echo '"' . $srcID . '"'; ?>;
@@ -353,6 +354,12 @@
                                   panZoom.pause() 
                      });
 <?php } ?>
+<?php if ( isset($_POST['view']) ) {
+
+      $view  = strip_tags(trim($_POST['view' ]));
+      echo 'console.log("'. $view . '")' . "\n";
+
+      } ?>
  </script>
  <script src="cropboxen.js"></script>
 </head>

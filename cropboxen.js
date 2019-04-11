@@ -66,7 +66,9 @@
      });
 // ------------------------------------------------------------------------- //
    $("#switchversion").change(function(){ 
-     window.location = "?v=" + this.value + "&show=" + srcID;
+     //window.location = "?v=" + this.value + "&show=" + srcID;
+     $.redirect("?v=" + this.value + "&show=" + srcID, 
+               {view:"2.000:100:100",layers:"12345"},"POST","_self");
    });
    $("#switchversion").mouseup(function(event){$(this).blur()});
 // ------------------------------------------------------------------------- //
