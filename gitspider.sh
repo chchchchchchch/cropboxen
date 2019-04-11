@@ -15,9 +15,9 @@
 # --------------------------------------------------------------------------- #
 # TODO
 # --------------------------------------------------------------------------- #
-  if [ -d "$INPUT" ] || [ -f "$INPUT" ]
-   then GITDIR=`realpath $INPUT`;GITDIR=`dirname $GITDIR` 
-   else echo "$INPUT DOES NOT EXIST (?)";exit 0 
+  if [ -d "$INPUT" ];then GITDIR=`realpath $INPUT`
+  elif [ -f "$INPUT" ];then GITDIR=`realpath $INPUT`;GITDIR=`dirname $GITDIR` 
+  else echo "$INPUT DOES NOT EXIST (?)";exit 0 
   fi
 # --------------------------------------------------------------------------- #
   if [ `verifyGitPath $GITDIR | wc -l` -gt 0 ]
