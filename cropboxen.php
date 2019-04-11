@@ -332,7 +332,7 @@
          var svgHeight = <?php echo $svgHght; ?>;
              var zeroX = <?php echo $zeroX; ?>; // srcOffsetX ???
              var zeroY = <?php echo $zeroY; ?>; // srcOffsetY ???
-         var svgLayers = { <?php $comma ="";
+         var svgLayers = { <?php $comma = "";
                             foreach ($layers as $cnt => $layerConf) { 
                                      $liD       = $layers[$cnt]['liD'];
                                      $layerName = $layers[$cnt]['layername'];
@@ -344,31 +344,45 @@
                                          '"';
                             $comma = ",\n                           ";
                          }
-                         ?> }
-<?php $views = loadViews($viewList);
-      if ( isset($views) ) { ?>
-        $(document).ready(function(){loadView(<?php $comma="";
-                                               foreach ($views[array_rand($views)] as $value)
-                                                { echo $comma.$value;$comma=","; }
-                                               ?>);});
+                         ?> };
+<?php   $savedViews = loadViews($viewList);
+        if ( isset($savedViews) ) { ?>
+        var savedViews = { <?php 
+        $comma = "";
+        foreach ($savedViews as $hash => $view) { 
 
-<?php } else { ?>
-    $(document).ready(function(){ panZoom = panzoom(document.getElementById('svg'));
-                                  panZoom.on('transform', function(e) {
-                                              panX = panZoom.getTransform().x;
-                                              panY = panZoom.getTransform().y;
-                                              pzScale = panZoom.getTransform().scale;
-                                  });
-                                  panZoom.pause() 
-                     });
-<?php } ?>
-<?php if ( isset($_SESSION[$srcID.'view']) ) {
+          echo $comma . '"' . $hash . '":' .
+               '[\'' .
+               $savedViews[$hash]['zoom'] .
+               '\',\'' .
+               $savedViews[$hash]['panx'] .
+               '\',\'' .
+               $savedViews[$hash]['pany'] .
+               '\',\'' .
+               $savedViews[$hash]['lyrs'] . '\']';
+
+        $comma = ",\n                           ";
+        }
+     ?> };
+<?php }
+      if ( isset($_SESSION[$srcID.'view']) ) {
            $view = $_SESSION[$srcID.'view'];
            echo 'console.log("'. $view . '");' . "\n";
            echo '$(document).ready(function(){loadView('
                                               .  preg_replace('/:/',',',$view) 
                                               . ',"111111111111");});' . "\n";
-      } ?>
+       } else { ?>
+
+  $(document).ready(function(){ panZoom = panzoom(document.getElementById('svg'));
+                                panZoom.on('transform', function(e) {
+                                            panX = panZoom.getTransform().x;
+                                            panY = panZoom.getTransform().y;
+                                            pzScale = panZoom.getTransform().scale;
+                                });
+                              panZoom.pause() 
+                             });
+<?php } ?>
+
  </script>
  <script src="cropboxen.js"></script>
 </head>
@@ -442,7 +456,7 @@
                         $liD . 
                        '" class="layerSwitch" ' . 
                         $checked .
-                       'autocomplete="off">' . 
+                       ' autocomplete="off">' . 
                         $layerName .
                        '<br>' . "\n";
       }
