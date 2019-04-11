@@ -110,7 +110,14 @@
       $viD = strip_tags(trim($_GET['v'])); // TODO: DIFFERENT FORMATS/VERIFY
 
      } else { $viD = "X"; }
-
+  // -------------------------------------------------------------------- //
+  // SET AND REDIRECT IF VIEW IS SET
+  // -------------------------------------------------------------------- //
+     if ( isset($_POST['view']) ) {
+          $_SESSION[$viD.'view'] = strip_tags(trim($_POST['view' ]));
+          header("Location:".$_SERVER['REQUEST_URI']);
+     } 
+  // -------------------------------------------------------------------- //
      $vConf   = $srcBasePath . "/" . $srcID . "/" . $viD . ".txt";
   // -------------------------------------------------------------------- //
      if ( !file_exists($vConf) ) {
@@ -355,12 +362,8 @@
                                   panZoom.pause() 
                      });
 <?php } ?>
-<?php if ( isset($_POST['view']) ) {
-           $_SESSION['view'] = strip_tags(trim($_POST['view' ]));
-           header("Location:".$_SERVER['REQUEST_URI']);
-      } 
-      if ( isset($_SESSION['view']) ) {
-           $view = $_SESSION['view'];
+<?php if ( isset($_SESSION[$viD.'view']) ) {
+           $view = $_SESSION[$viD.'view'];
            echo 'console.log("'. $view . '");' . "\n";
            echo '$(document).ready(function(){loadView('
                                               .  preg_replace('/:/',',',$view) 
