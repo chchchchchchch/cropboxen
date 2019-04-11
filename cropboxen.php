@@ -114,7 +114,7 @@
   // SET AND REDIRECT IF VIEW IS SET
   // -------------------------------------------------------------------- //
      if ( isset($_POST['view']) ) {
-          $_SESSION[$viD.'view'] = strip_tags(trim($_POST['view' ]));
+          $_SESSION[$srcID.'view'] = strip_tags(trim($_POST['view' ]));
           header("Location:".$_SERVER['REQUEST_URI']);
      } 
   // -------------------------------------------------------------------- //
@@ -362,8 +362,8 @@
                                   panZoom.pause() 
                      });
 <?php } ?>
-<?php if ( isset($_SESSION[$viD.'view']) ) {
-           $view = $_SESSION[$viD.'view'];
+<?php if ( isset($_SESSION[$srcID.'view']) ) {
+           $view = $_SESSION[$srcID.'view'];
            echo 'console.log("'. $view . '");' . "\n";
            echo '$(document).ready(function(){loadView('
                                               .  preg_replace('/:/',',',$view) 
