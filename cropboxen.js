@@ -309,7 +309,7 @@
 
    }
 // ------------------------------------------------------------------------- //   
-   function getView() { // TODO
+   function getView() {
 
       svgScale = $('div#svg').width() / svgWidth;
 
@@ -330,7 +330,11 @@
 
    }
 // ------------------------------------------------------------------------- //   
-   function loadView(Z,X,Y,L) { // TODO
+   function saveView() {
+
+   }
+// ------------------------------------------------------------------------- //   
+   function loadView(Z,X,Y,L) {
 
       loadZoom    = Z;
       viewCenterX = X;
@@ -386,6 +390,12 @@
        return [left,top];
    }
 // ------------------------------------------------------------------------- //
+   function rndItem(object) { 
+
+          keys = Object.keys(object);
+          return object[keys[Math.floor(keys.length * Math.random())]];
+   };
+// ------------------------------------------------------------------------- //
 // ========================================================================= //
 //  U I
 // ========================================================================= //
@@ -404,7 +414,18 @@
        keyCode = e.keyCode || e.which;
 
        if ( keyCode == 83) { saveView(); }
-    /* if ( keyCode == 76) { loadView(); } */
+       if ( keyCode == 76) {
+        if ( Object.keys(savedViews).length != 0 ) {
+
+              Z = rndItem(savedViews)[0];
+              X = rndItem(savedViews)[1];
+              Y = rndItem(savedViews)[2];
+              L = rndItem(savedViews)[3];
+
+              loadView(Z,X,Y,L);
+
+        }
+       }
        if ( keyCode == 9 && editMode != true ) {
 
             editMode = true;
