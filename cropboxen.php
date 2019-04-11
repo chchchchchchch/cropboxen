@@ -345,27 +345,28 @@
                             $comma = ",\n                           ";
                          }
                          ?> };
-<?php   $savedViews = loadViews($viewList);
-        if ( isset($savedViews) ) { ?>
-        var savedViews = { <?php 
-        $comma = "";
-        foreach ($savedViews as $hash => $view) { 
+<?php   $savedViews = loadViews($viewList); ?>
+        var savedViews = {<?php 
+        if ( isset($savedViews) ) {
 
-          echo $comma . '"' . $hash . '":' .
-               '[\'' .
-               $savedViews[$hash]['zoom'] .
-               '\',\'' .
-               $savedViews[$hash]['panx'] .
-               '\',\'' .
-               $savedViews[$hash]['pany'] .
-               '\',\'' .
-               $savedViews[$hash]['lyrs'] . '\']';
-
-        $comma = ",\n                           ";
-        }
-     ?> };
-<?php }
-      if ( isset($_SESSION[$srcID.'view']) ) {
+          $comma = " ";
+          foreach ($savedViews as $hash => $view) { 
+  
+            echo $comma . '"' . $hash . '":' .
+                 '[\'' .
+                 $savedViews[$hash]['zoom'] .
+                 '\',\'' .
+                 $savedViews[$hash]['panx'] .
+                 '\',\'' .
+                 $savedViews[$hash]['pany'] .
+                 '\',\'' .
+                 $savedViews[$hash]['lyrs'] . '\']';
+  
+          $comma = ",\n                           ";
+          }
+        } ?>
+ };
+<?php if ( isset($_SESSION[$srcID.'view']) ) {
            $view = $_SESSION[$srcID.'view'];
            echo 'console.log("'. $view . '");' . "\n";
            echo '$(document).ready(function(){loadView('
