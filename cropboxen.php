@@ -355,10 +355,10 @@
                      });
 <?php } ?>
 <?php if ( isset($_POST['view']) ) {
-
       $view  = strip_tags(trim($_POST['view' ]));
       echo 'console.log("'. $view . '")' . "\n";
-
+      echo 'if (window.history.replaceState){' .
+           ' window.history.replaceState(null,null,window.location.href);}'."\n";
       } ?>
  </script>
  <script src="cropboxen.js"></script>
