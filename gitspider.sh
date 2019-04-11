@@ -30,7 +30,8 @@
   GITSUBPATH=`echo $INPUT |                #
               sed "s,^$GITROOTPATH,," |    #
               sed 's,^/,,' | sed 's,/$,,'` #
-  if [ -d "$GITROOTPATH/$GITSUBPATH" ];then GITSUBPATH="${GITSUBPATH}/";fi
+  if [ "$GITSUBPATH" != "" ] &&
+     [ -d "$GITROOTPATH/$GITSUBPATH" ];then GITSUBPATH="${GITSUBPATH}/";fi
 # --------------------------------------------------------------------------- #
   GITREMOTEBASEURLS=`getGitRemoteBaseUrls $GITROOTPATH`
   for URL in $GITREMOTEBASEURLS
