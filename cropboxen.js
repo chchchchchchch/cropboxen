@@ -67,8 +67,9 @@
 // ------------------------------------------------------------------------- //
    $("#switchversion").change(function(){ 
      //window.location = "?v=" + this.value + "&show=" + srcID;
+     currentView = getView();
      $.redirect("?v=" + this.value + "&show=" + srcID, 
-               {view:"2.000:100:100",layers:"12345"},"POST","_self");
+               {view:currentView,layers:"12345"},"POST","_self");
    });
    $("#switchversion").mouseup(function(event){$(this).blur()});
 // ------------------------------------------------------------------------- //
@@ -308,7 +309,7 @@
 
    }
 // ------------------------------------------------------------------------- //   
-   function saveView() { // TODO
+   function getView() { // TODO
 
       svgScale = $('div#svg').width() / svgWidth;
 
@@ -322,7 +323,10 @@
                              / svgScale);
 
       layersVisible = visibleLayers();
-      thisView = viewZoom+":"+viewCenterX+":"+viewCenterY+":"+layersVisible;
+    //thisView = viewZoom+":"+viewCenterX+":"+viewCenterY+":"+layersVisible;
+      thisView = viewZoom+":"+viewCenterX+":"+viewCenterY;
+
+      return thisView;
 
    }
 // ------------------------------------------------------------------------- //   

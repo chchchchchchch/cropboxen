@@ -1,4 +1,6 @@
 <?php 
+
+   session_start();
 // ------------------------------------------------------------------------- //
 // GLOBALS                                                                   //
 // ------------------------------------------------------------------------- //
@@ -338,7 +340,6 @@
                          ?> }
 <?php $views = loadViews($viewList);
       if ( isset($views) ) { ?>
-
         $(document).ready(function(){loadView(<?php $comma="";
                                                foreach ($views[array_rand($views)] as $value)
                                                 { echo $comma.$value;$comma=","; }
@@ -355,10 +356,15 @@
                      });
 <?php } ?>
 <?php if ( isset($_POST['view']) ) {
-      $view  = strip_tags(trim($_POST['view' ]));
-      echo 'console.log("'. $view . '")' . "\n";
-      echo 'if (window.history.replaceState){' .
-           ' window.history.replaceState(null,null,window.location.href);}'."\n";
+           $_SESSION['view'] = strip_tags(trim($_POST['view' ]));
+           header("Location:".$_SERVER['REQUEST_URI']);
+      } 
+      if ( isset($_SESSION['view']) ) {
+           $view = $_SESSION['view'];
+           echo 'console.log("'. $view . '");' . "\n";
+           echo '$(document).ready(function(){loadView('
+                                              .  preg_replace('/:/',',',$view) 
+                                              . ',"111111111111");});' . "\n";
       } ?>
  </script>
  <script src="cropboxen.js"></script>
