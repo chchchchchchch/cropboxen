@@ -110,7 +110,7 @@
      if ( isset($_POST['view']) ) {
           $_SESSION[$srcID.'view'] = strip_tags(trim($_POST['view' ]));
           header("Location:".$_SERVER['REQUEST_URI']);
-     }
+     } 
   // -------------------------------------------------------------------- //
      if ( isset( $_GET['v'] )) { 
 
@@ -316,10 +316,8 @@
 <html lang="en">
 <head><meta charset="UTF-8">
  <link rel="stylesheet" href="<?php echo $cssPath;?>svg.css">
- <style> div.svg { width:<?php echo $svgWdth; ?>px;
-                   height:<?php echo $svgHght; ?>px; }
-         div.svg > .layer { margin-top: <?php echo $zeroY; ?>px;
-                            margin-left: <?php echo $zeroX; ?>px; }
+ <style> div.svg { width:80vw;
+                   height:<?php echo ceil($svgHght/$svgWdth*80); ?>vw; }
  </style>
  <link rel="stylesheet" href="<?php echo $cssPath;?>imgareaselect-default.css">
  <script src="<?php echo $jsPath;?>jquery-3.3.1.js"></script>
