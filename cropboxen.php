@@ -107,9 +107,13 @@
   // -------------------------------------------------------------------- //
   // SET AND REDIRECT IF VIEW IS SET
   // -------------------------------------------------------------------- //
-     if ( isset($_POST['view']) ) {
-          $_SESSION[$srcID.'view'] = strip_tags(trim($_POST['view' ]));
-          header("Location:".$_SERVER['REQUEST_URI']);
+     if ( isset($_POST['currentView']) &&
+          isset($_POST['currentLayers']) ) { // TODO: VERIFY
+
+      $_SESSION[$srcID.'View'] = strip_tags(trim($_POST['currentView']));
+      $_SESSION[$srcID.'Layers'] = strip_tags(trim($_POST['currentLayers']));
+      header("Location:".$_SERVER['REQUEST_URI']);
+
      } 
   // -------------------------------------------------------------------- //
      if ( isset( $_GET['v'] )) { 
@@ -259,7 +263,7 @@
                        $zoom = explode(':',$rest)[0];
                        $panx = explode(':',$rest)[1];
                        $pany = explode(':',$rest)[2];
-                       $lyrs = '"'.explode(':',$rest)[3].'"';
+                       $lyrs = explode(':',$rest)[3];
 
                        $unify[$hash] = array('flag' => $flag,
                                              'date' => $date,
@@ -366,12 +370,18 @@
           }
         } ?>
  };
-<?php if ( isset($_SESSION[$srcID.'view']) ) {
-           $view = $_SESSION[$srcID.'view'];
-           echo 'console.log("'. $view . '");' . "\n";
-           echo '$(document).ready(function(){loadView('
-                                              .  preg_replace('/:/',',',$view) 
-                                              . ',"111111111111");});' . "\n";
+<?php if ( isset($_SESSION[$srcID.'View']) &&
+           isset($_SESSION[$srcID.'Layers']) ) {
+
+           $currentView = $_SESSION[$srcID.'View'];
+           $currentLayers = $_SESSION[$srcID.'Layers'];
+
+         //echo 'console.log("'. $currentView . '");' . "\n";
+         //echo 'console.log("'. $currentLayers . '");' . "\n";
+
+           echo '$(document).ready(function(){' .
+                  'loadView(' . preg_replace('/:/',',',$currentView) 
+                              . ',"' . $currentLayers . '");});' . "\n";
        } else { ?>
 
   $(document).ready(function(){ panZoom = panzoom(document.getElementById('svg'));

@@ -14,13 +14,16 @@
    var cBList = [];
    var pendingRm = ""; // WAIT HERE BEFORE BEING REMOVED
 
+   var layerVisibility;
+   var visibleLayersByID;
+   var visibleLayersByName;
 
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
    windowWidth = $(window).width();
    svgScale = $('div#svg').width() / svgWidth;
-   visibleLayerNames(); // INIT
+   saveLayerVisibility(); // INIT
 // ------------------------------------------------------------------------- //
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
@@ -62,14 +65,19 @@
              $(this).hide();
           });   
        }
-       visibleLayerNames();
+       saveLayerVisibility();
      });
 // ------------------------------------------------------------------------- //
    $("#switchversion").change(function(){ 
      //window.location = "?v=" + this.value + "&show=" + srcID;
      currentView = getView();
+     currentLayers = visibleLayersByID.join("");
+
      $.redirect("?v=" + this.value + "&show=" + srcID, 
-               {view:currentView,layers:"12345"},"POST","_self");
+               {currentView:currentView,
+                currentLayers:currentLayers},
+               "POST","_self");
+
    });
    //$("#switchversion").mouseup(function(event){$(this).blur()});
 // ------------------------------------------------------------------------- //
@@ -244,71 +252,88 @@
      w = Math.ceil($(sID).attr("width"));
      h = Math.ceil($(sID).attr("height"));
 
-     if ( vLCount < Object.keys(svgLayers).length ) { 
-          layers = " --layers=" + vLList;
+     if ( visibleLayersByName.length < Object.keys(svgLayers).length ) {
+          layers = " --layers=" + visibleLayersByName.join(",");
      } else { layers = ""; }
 
-     if ( vLCount == 0 ) { mdshcode = "NOTHING TO SEE!"
-     } else { mdshcode = "% SHOW: " + gitUrl + 
-                         " --area=" + x + 
-                         ":"        + y +
-                         ":"        + w +
-                         ":"        + h +
-                         layers;
+     if ( visibleLayersByName.length == 0 ) { mdshcode = "NOTHING TO SEE!"
+     } else { 
+                      mdshcode = "% SHOW: " + gitUrl + 
+                                 " --area=" + x + 
+                                 ":"        + y +
+                                 ":"        + w +
+                                 ":"        + h +
+                                 layers;
      } 
    
      $('#showmdsh').val(mdshcode);
 
    }
 // ------------------------------------------------------------------------- //
-   function visibleLayers() { // https://stackoverflow.com/questions/1965075
+   function saveLayerVisibility() {
 
-     vLList = "";
+     layerVisibility = "";     // RESET
+     visibleLayersByID = [];   // RESET
+     visibleLayersByName = []; // RESET
+
      $('div#layercontrol > input[type=checkbox]').each(function () {
-         var lThisVal = (this.checked ? "1" : "0");
-         vLList += (vLList=="" ? lThisVal : + lThisVal);
-      });
-     return vLList;
+        liD = $(this).attr('id');
+        lName = svgLayers[liD];
+        if  ( this.checked ) {
+
+                 visibleLayersByID.push(liD);
+                 visibleLayersByName.push(lName);
+                 layerVisibility = layerVisibility + "1";
+
+        } else { layerVisibility = layerVisibility + "0"; }
+
+     });
 
    }
 // ------------------------------------------------------------------------- //
-   function visibleLayerNames() {
+   function toggleLayerVisibility(L) {
 
-     vLList = "";vLCount = 0
-     $('div#layercontrol > input[type=checkbox]').each(function () {
-         liD = $(this).attr('id');
-         lName = svgLayers[liD];
-         var lThisVal = (this.checked ? lName : "");
-         if ( lThisVal != "" ) {
-         vLList += (vLList=="" ? lThisVal : "," + lThisVal);
-         vLCount++;
-         }
-      });
+     if ( L.match(/^([01]*)$/) &&
+          L.length  == Object.keys(svgLayers).length ) {
+ 
+          var i = 0;
+          $('.layerSwitch').each(function () {
+             if ( L.charAt(i) == 0 ) {
+                      $(this).prop( "checked",false);
+              } else { $(this).prop( "checked",true);
+             }
+            i++;
+          });
+     
+          var i = 0;
+          $('.layer.src').each(function () {
+             if ( L.charAt(i) == 0 ) {
+                      $(this).hide();
+              } else { $(this).show(); 
+             }
+            i++;
+          });
+ 
+     } else {
+ 
+          $('.layerSwitch').each(function () {
+            liD = $(this).attr('id');
+            if ( L.includes(liD) ) {
 
+                     $(this).prop( "checked",true);
+                     $('#svg > div.layer.'+liD).each(function() {
+                      $(this).show();
+                     });
+
+            } else { $(this).prop( "checked",false);
+                     $('#svg > div.layer.'+liD).each(function() {
+                      $(this).hide();
+                     });
+            }
+          }); 
+     }
    }
-// ------------------------------------------------------------------------- //   
-   function toggleLayers(layerCode) {
-
-     var i = 0;
-     $('.layerSwitch').each(function () {
-        if ( layerCode.charAt(i) == 0 ) {
-                 $(this).prop( "checked",false);
-         } else { $(this).prop( "checked",true);
-        }
-       i++;
-     });
-
-     var i = 0;
-     $('.layer.src').each(function () {
-        if ( layerCode.charAt(i) == 0 ) {
-                 $(this).hide();
-         } else { $(this).show(); 
-        }
-       i++;
-     });
-
-   }
-// ------------------------------------------------------------------------- //   
+// ------------------------------------------------------------------------- //
    function getView() {
 
       svgScale = $('div#svg').width() / svgWidth;
@@ -321,16 +346,13 @@
       viewCenterY = Math.floor(panZoom.getTransform().y 
                               / (viewZoom - 1) * -1
                              / svgScale);
-
-      layersVisible = visibleLayers();
-    //thisView = viewZoom+":"+viewCenterX+":"+viewCenterY+":"+layersVisible;
       thisView = viewZoom+":"+viewCenterX+":"+viewCenterY;
 
       return thisView;
 
    }
 // ------------------------------------------------------------------------- //   
-   function saveView() {
+   function saveView() { // TODO
 
    }
 // ------------------------------------------------------------------------- //   
@@ -340,7 +362,8 @@
       viewCenterX = X;
       viewCenterY = Y;
 
-      toggleLayers(L);
+    //toggleLayers(L);
+      toggleLayerVisibility(L);
 
       svgScale = $('div#svg').width() / svgWidth;
 
@@ -413,8 +436,13 @@
 
        keyCode = e.keyCode || e.which;
 
-       if ( keyCode == 83) { saveView(); }
+       if ( keyCode == 83) { saveView(); 
+
+       saveLayerVisibility();
+
+       }
        if ( keyCode == 76) {
+
         if ( Object.keys(savedViews).length != 0 ) {
 
               Z = rndItem(savedViews)[0];
@@ -425,6 +453,9 @@
               loadView(Z,X,Y,L);
 
         }
+
+//     toggleLayerVisibility();
+
        }
        if ( keyCode == 9 && editMode != true ) {
 
