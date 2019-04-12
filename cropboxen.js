@@ -424,6 +424,16 @@
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
+// POST NOTICE IF F5 (UNLOAD) IS PRESSED
+// ------------------------------------------------------------------------- //
+     $(window).bind('keydown',function(e) {
+       keyCode = e.keyCode || e.which;
+       if ( keyCode == 116) { 
+            $.ajax({url:"cropboxen.php",data:{unset:'session'},
+                    datatype: "text",type: "POST"});
+       }
+     })
+// ------------------------------------------------------------------------- //
      window.addEventListener("keydown", function(e) {
       // console.log(e.keyCode);
       // space and arrow keys and return and tab and s and l
@@ -436,11 +446,7 @@
 
        keyCode = e.keyCode || e.which;
 
-       if ( keyCode == 83) { saveView(); 
-
-       saveLayerVisibility();
-
-       }
+       if ( keyCode == 83) { saveView(); }
        if ( keyCode == 76) {
 
         if ( Object.keys(savedViews).length != 0 ) {
@@ -453,9 +459,6 @@
               loadView(Z,X,Y,L);
 
         }
-
-//     toggleLayerVisibility();
-
        }
        if ( keyCode == 9 && editMode != true ) {
 
