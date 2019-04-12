@@ -8,7 +8,8 @@
    $jsPath  = "lib/js/";
    $cssPath = "lib/css/";
    $foo = array();$foo[0] = '/%SRCID%/';$foo[1] = '/%VERSION%/';
-   $urlPattern  = "https://freeze.sh/_/2019/icebergen/cropboxen.php?show=%SRCID%&v=%VERSION%";
+   $baseUrl = "https://freeze.sh/_/2019/icebergen/cropboxen.php";
+   $urlPattern  = $baseUrl . "?show=%SRCID%&v=%VERSION%";
 
 // ------------------------------------------------------------------------- // 
 // SAVE CROPBOX                                                              // 
@@ -23,7 +24,7 @@
           isset($_POST['srcID'])  &&
           count($_POST) == 5 ) {
 
-          $id    = strip_tags(trim($_POST['id' ]));
+          $id    = strip_tags(trim($_POST['id']));
           $viD   = strip_tags(trim($_POST['viD'] ));
           $flag  = strip_tags(trim($_POST['flag']));
           $area  = strip_tags(trim($_POST['area']));
