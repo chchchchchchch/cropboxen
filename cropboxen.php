@@ -150,6 +150,7 @@
 
      $svgWdth = getValue($conf,'W','REQUIRED');
      $svgHght = getValue($conf,'H','REQUIRED');
+     $srcWdth = getValue($conf,'SRCW','800');
      $zeroX   = explode(':',getValue($conf,'AREA','REQUIRED'))[0];
      $zeroY   = explode(':',getValue($conf,'AREA','REQUIRED'))[1];
      $gitUrl  = getValue($conf,'GITURL','GIT URL MISSING');
@@ -337,6 +338,7 @@
             var gitUrl = <?php echo '"' . $gitUrl . '"'; ?>;
           var svgWidth = <?php echo $svgWdth; ?>;
          var svgHeight = <?php echo $svgHght; ?>;
+          var srcWidth = <?php echo $srcWdth; ?>;
              var zeroX = <?php echo $zeroX; ?>; // srcOffsetX ???
              var zeroY = <?php echo $zeroY; ?>; // srcOffsetY ???
          var svgLayers = { <?php $comma = "";
@@ -352,6 +354,7 @@
                             $comma = ",\n                           ";
                          }
                          ?> };
+
 <?php   $savedViews = loadViews($viewList); ?>
         var savedViews = {<?php 
         if ( isset($savedViews) ) {
@@ -373,6 +376,23 @@
           }
         } ?>
  };
+
+ $(document).ready(function(){ 
+
+   windowWidth = $(window).width();                    // INIT
+   viewPortCenterX = ($(window).width()/100*80) / 2;   // INIT
+   viewPortCenterY = ($(window).height()/100*90) / 2;  // INIT
+   svgScale    = $('div#svg').width() / svgWidth;      // INIT
+   saveLayerVisibility();                              // INIT
+   
+                               panZoom = panzoom(document.getElementById('svg'));
+                               panZoom.on('transform', function(e) {
+                                           panX = panZoom.getTransform().x;
+                                           panY = panZoom.getTransform().y;
+                                           pzScale = panZoom.getTransform().scale;
+                               });
+                               panZoom.pause() 
+  });
 <?php if ( isset($_SESSION[$srcID.'View']) &&
            isset($_SESSION[$srcID.'Layers']) ) {
 
@@ -382,23 +402,11 @@
          //echo 'console.log("'. $currentView . '");' . "\n";
          //echo 'console.log("'. $currentLayers . '");' . "\n";
 
-           echo '$(document).ready(function(){' .
-                  'loadView(' . preg_replace('/:/',',',$currentView) 
-                              . ',"' . $currentLayers . '");});' . "\n";
-       } else { ?>
-
-  $(document).ready(function(){ panZoom = panzoom(document.getElementById('svg'));
-                                panZoom.on('transform', function(e) {
-                                            panX = panZoom.getTransform().x;
-                                            panY = panZoom.getTransform().y;
-                                            pzScale = panZoom.getTransform().scale;
-                                });
-                              panZoom.pause() 
-                             });
-<?php } ?>
-
- </script>
- <script src="cropboxen.js"></script>
+           echo "\n" . ' $(document).ready(function(){' .
+                       'setView(' . preg_replace('/:/',',',$currentView) 
+                                  . ',"' . $currentLayers . '");});' . "\n\n";
+       } ?>
+ </script><script src="cropboxen.js"></script>
 </head>
 <body style="background-color:<?php echo $bgColor; ?>;">
 <div class="svg" id="svg">
