@@ -150,6 +150,8 @@
 
      $svgWdth = getValue($conf,'W','REQUIRED');
      $svgHght = getValue($conf,'H','REQUIRED');
+     $srcWdth = getValue($conf,'SRCW','REQUIRED');
+     $srcHght = getValue($conf,'SRCH','REQUIRED');
      $zeroX   = explode(':',getValue($conf,'AREA','REQUIRED'))[0];
      $zeroY   = explode(':',getValue($conf,'AREA','REQUIRED'))[1];
      $gitUrl  = getValue($conf,'GITURL','GIT URL MISSING');
@@ -334,6 +336,8 @@
  <script src="<?php echo $jsPath;?>panzoom.js"></script>
  <script>      var viD = <?php echo '"' . $viD . '"'; ?>;
              var srcID = <?php echo '"' . $srcID . '"'; ?>;
+          var srcWidth = <?php echo '"' . $srcWdth . '"'; ?>;
+         var srcHeight = <?php echo '"' . $srcHght . '"'; ?>;
             var gitUrl = <?php echo '"' . $gitUrl . '"'; ?>;
           var svgWidth = <?php echo $svgWdth; ?>;
          var svgHeight = <?php echo $svgHght; ?>;
