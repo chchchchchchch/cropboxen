@@ -346,17 +346,47 @@
     //svgViewY = panY / svgScale / pzScale;
     //srcViewX = panX / svgScale / pzScale - zeroX;
     //srcViewY = panY / svgScale / pzScale - zeroY;
-      srcViewCenterX = ((panX / svgScale / pzScale - zeroX) 
+      srcViewCenterX = Math.round((panX / svgScale / pzScale - zeroX) 
                        - (viewPortCenterX / svgScale / pzScale)) * -1;
-      srcViewCenterY = ((panY / svgScale / pzScale - zeroY) 
+      srcViewCenterY = Math.round((panY / svgScale / pzScale - zeroY) 
                        - (viewPortCenterY / svgScale / pzScale)) * -1;
 
-    //console.log("panX: " + panX);
+      console.log("GET VIEW");
+      console.log("panX: " + panX);
+      console.log("panY: " + panY);
     //console.log("srcViewX: " + srcViewX);
     //console.log("srcViewY: " + srcViewY);
       console.log("srcViewCenterX: " + srcViewCenterX);
       console.log("srcViewCenterY: " + srcViewCenterY);
 
+      thisView = pzScale.toFixed(3) 
+                + ":" + 
+                 srcViewCenterX
+                + ":" +
+                 srcViewCenterY;
+
+      return thisView;
+
+   }
+// ------------------------------------------------------------------------- //
+   function loadViewDEV(Z,X,Y,L) {
+
+      loadZoom       = Z;
+      srcViewCenterX = X;
+      srcViewCenterY = Y;
+
+     panX = Math.round(((srcViewCenterX / -1) 
+            + (viewPortCenterX / svgScale / pzScale)
+            + zeroX) * svgScale * pzScale);
+     panY = Math.round(((srcViewCenterY / -1) 
+            + (viewPortCenterY / svgScale / pzScale)
+            + zeroY) * svgScale * pzScale);
+
+     console.log("LOAD VIEW");
+     console.log("panX: " + panX);
+     console.log("panY: " + panY);
+     console.log("srcViewCenterX: " + srcViewCenterX);
+     console.log("srcViewCenterY: " + srcViewCenterY);
 
    }
 // ------------------------------------------------------------------------- //   
@@ -380,8 +410,18 @@
 // ------------------------------------------------------------------------- //   
    function saveView() { // TODO
 
-    getViewDEV();
+
+  //getViewDEV();
   //console.log(getView());
+  //console.log(getViewDEV());
+
+    tmpView = getViewDEV();
+  //console.log(tmpView.split(":")[0]);
+
+    loadViewDEV(tmpView.split(":")[0],
+                tmpView.split(":")[1],
+                tmpView.split(":")[2],
+                1111111);
 
    }
 // ------------------------------------------------------------------------- //   
