@@ -9,8 +9,11 @@
    var resizing = false;var resizeTimeout;
 
    var svgScale;
+
    var windowWidth;
-   var vLList;var vLCount;
+   var viewPortCenterX;var viewPortCenterY;
+
+ //var vLList;var vLCount; // OBSOLETE ??
    var cBList = [];
    var pendingRm = ""; // WAIT HERE BEFORE BEING REMOVED
 
@@ -21,9 +24,12 @@
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
-   windowWidth = $(window).width();
-   svgScale = $('div#svg').width() / svgWidth;
-   saveLayerVisibility(); // INIT
+   windowWidth = $(window).width();               // INIT
+   svgScale    = $('div#svg').width() / svgWidth; // INIT
+   saveLayerVisibility();                         // INIT
+// ------------------------------------------------------------------------- //
+   viewPortCenterX = ($(window).width()/100*80) / 2;
+   viewPortCenterY = ($(window).height()/100*90) / 2;
 // ------------------------------------------------------------------------- //
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
@@ -334,6 +340,26 @@
      }
    }
 // ------------------------------------------------------------------------- //
+   function getViewDEV() {
+
+    //svgViewX = panX / svgScale / pzScale;
+    //svgViewY = panY / svgScale / pzScale;
+    //srcViewX = panX / svgScale / pzScale - zeroX;
+    //srcViewY = panY / svgScale / pzScale - zeroY;
+      srcViewCenterX = ((panX / svgScale / pzScale - zeroX) 
+                       - (viewPortCenterX / svgScale / pzScale)) * -1;
+      srcViewCenterY = ((panY / svgScale / pzScale - zeroY) 
+                       - (viewPortCenterY / svgScale / pzScale)) * -1;
+
+    //console.log("panX: " + panX);
+    //console.log("srcViewX: " + srcViewX);
+    //console.log("srcViewY: " + srcViewY);
+      console.log("srcViewCenterX: " + srcViewCenterX);
+      console.log("srcViewCenterY: " + srcViewCenterY);
+
+
+   }
+// ------------------------------------------------------------------------- //   
    function getView() {
 
       svgScale = $('div#svg').width() / svgWidth;
@@ -354,7 +380,8 @@
 // ------------------------------------------------------------------------- //   
    function saveView() { // TODO
 
-    console.log(getView());
+    getViewDEV();
+  //console.log(getView());
 
    }
 // ------------------------------------------------------------------------- //   
@@ -461,6 +488,7 @@
               loadView(Z,X,Y,L);
 
         }
+
        }
        if ( keyCode == 9 && editMode != true ) {
 
