@@ -21,6 +21,9 @@
    var visibleLayersByID;
    var visibleLayersByName;
 
+   var checkView;
+
+
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
@@ -340,56 +343,92 @@
      }
    }
 // ------------------------------------------------------------------------- //
-   function getViewDEV() {
+   function getView() {
 
-    //svgViewX = panX / svgScale / pzScale;
-    //svgViewY = panY / svgScale / pzScale;
-    //srcViewX = panX / svgScale / pzScale - zeroX;
-    //srcViewY = panY / svgScale / pzScale - zeroY;
-      srcViewCenterX = Math.round((panX / svgScale / pzScale - zeroX) 
-                       - (viewPortCenterX / svgScale / pzScale)) * -1;
-      srcViewCenterY = Math.round((panY / svgScale / pzScale - zeroY) 
-                       - (viewPortCenterY / svgScale / pzScale)) * -1;
+      viewZoom = pzScale.toFixed(3);
+      viewPanX = Math.round(panX);
+      viewPanY = Math.round(panY);
+      srcViewCenterX = Math.round((viewPanX / svgScale / viewZoom - zeroX) 
+                       - (viewPortCenterX / svgScale / viewZoom)) * -1;
+      srcViewCenterY = Math.round((viewPanY / svgScale / viewZoom - zeroY) 
+                       - (viewPortCenterY / svgScale / viewZoom)) * -1;
 
-      console.log("GET VIEW");
-      console.log("panX: " + panX);
-      console.log("panY: " + panY);
-    //console.log("srcViewX: " + srcViewX);
-    //console.log("srcViewY: " + srcViewY);
-      console.log("srcViewCenterX: " + srcViewCenterX);
-      console.log("srcViewCenterY: " + srcViewCenterY);
-
-      thisView = pzScale.toFixed(3) 
+      thisView = viewZoom
                 + ":" + 
                  srcViewCenterX
                 + ":" +
                  srcViewCenterY;
 
+   //console.log(thisView + " viewZoom: " + viewZoom + " viewpanX: " + viewPanX + " viewpanY: " + viewPanY);
+     console.log("GET VIEW" +
+                 "  viewZoom: " + viewZoom +
+                 "  viewPanX: " + viewPanX +
+                 "  viewPanY: " + viewPanY +
+                 "  srcViewCenterX: " + srcViewCenterX + 
+                 "  srcViewCenterY: " + srcViewCenterY);
+     console.log("        " +
+                 "  pzScale: " + pzScale +
+                 "  panX: " + panX +
+                 "  panY: " + panY);
+
       return thisView;
 
    }
 // ------------------------------------------------------------------------- //
-   function loadViewDEV(Z,X,Y,L) {
+   function setView(Z,X,Y,L) {
 
-      loadZoom       = Z;
+      viewZoom       = Z;
       srcViewCenterX = X;
       srcViewCenterY = Y;
 
-     panX = Math.round(((srcViewCenterX / -1) 
-            + (viewPortCenterX / svgScale / pzScale)
-            + zeroX) * svgScale * pzScale);
-     panY = Math.round(((srcViewCenterY / -1) 
-            + (viewPortCenterY / svgScale / pzScale)
-            + zeroY) * svgScale * pzScale);
+      toggleLayerVisibility(L);
 
-     console.log("LOAD VIEW");
-     console.log("panX: " + panX);
-     console.log("panY: " + panY);
-     console.log("srcViewCenterX: " + srcViewCenterX);
-     console.log("srcViewCenterY: " + srcViewCenterY);
+/*
+      viewPanX = Math.round(((srcViewCenterX / -1) 
+                            + (viewPortCenterX / svgScale / viewZoom)
+                            + zeroX) * svgScale * viewZoom);
+      viewPanY = Math.round(((srcViewCenterY / -1) 
+                            + (viewPortCenterY / svgScale / viewZoom)
+                            + zeroY) * svgScale * viewZoom);
+*/
+      viewPanX = ((srcViewCenterX / -1) 
+                  + (viewPortCenterX / svgScale / viewZoom)
+                  + zeroX) * svgScale * viewZoom;
+      viewPanY = ((srcViewCenterY / -1) 
+                  + (viewPortCenterY / svgScale / viewZoom)
+                  + zeroY) * svgScale * viewZoom;
+
+//    $('#svg').removeAttr("style");
+/*
+      panZoom = panzoom(document.getElementById('svg'));
+      panZoom.on('transform', function(e) {
+                  panX = panZoom.getTransform().x;
+                  panY = panZoom.getTransform().y;
+                  pzScale = panZoom.getTransform().scale;
+      });
+      panZoom.pause();
+*/
+      panZoom.zoomAbs(viewPanX,viewPanY,viewZoom);   
+
+
+
+     console.log("SET VIEW" +
+                 "  viewZoom: " + viewZoom +
+                 "  viewPanX: " + viewPanX +
+                 "  viewPanY: " + viewPanY +
+                 "  srcViewCenterX: " + srcViewCenterX + 
+                 "  srcViewCenterY: " + srcViewCenterY);
+
+     console.log("        " +
+                 "  pzScale: " + pzScale +
+                 "  panX: " + panX +
+                 "  panY: " + panY);
+
+
 
    }
 // ------------------------------------------------------------------------- //   
+/*
    function getView() {
 
       svgScale = $('div#svg').width() / svgWidth;
@@ -407,24 +446,27 @@
       return thisView;
 
    }
+*/
 // ------------------------------------------------------------------------- //   
    function saveView() { // TODO
-
 
   //getViewDEV();
   //console.log(getView());
   //console.log(getViewDEV());
 
-    tmpView = getViewDEV();
+    checkView = getView();
   //console.log(tmpView.split(":")[0]);
 
-    loadViewDEV(tmpView.split(":")[0],
-                tmpView.split(":")[1],
-                tmpView.split(":")[2],
-                1111111);
+/*
+    setView(checkView.split(":")[0],
+            checkView.split(":")[1],
+            checkView.split(":")[2],
+            "111");
+*/
 
    }
 // ------------------------------------------------------------------------- //   
+/*
    function loadView(Z,X,Y,L) {
 
       loadZoom    = Z;
@@ -454,6 +496,7 @@
       panZoom.zoomAbs(loadPanX,loadPanY,loadZoom);   
 
    }
+*/
 // ------------------------------------------------------------------------- //
    function doneResizing(){ resizing = false;
                             popSelection();
@@ -517,7 +560,7 @@
 
        if ( keyCode == 83) { saveView(); }
        if ( keyCode == 76) {
-
+/*
         if ( Object.keys(savedViews).length != 0 ) {
 
               Z = rndItem(savedViews)[0];
@@ -525,9 +568,17 @@
               Y = rndItem(savedViews)[2];
               L = rndItem(savedViews)[3];
 
-              loadView(Z,X,Y,L);
+              setView(Z,X,Y,L);
 
         }
+*/
+
+    setView(checkView.split(":")[0],
+            checkView.split(":")[1],
+            checkView.split(":")[2],
+            "111");
+
+
 
        }
        if ( keyCode == 9 && editMode != true ) {
