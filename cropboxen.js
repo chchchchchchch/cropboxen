@@ -9,6 +9,8 @@
    var resizing = false;var resizeTimeout;
 
    var svgScale;
+   var srcWidth = 1059;
+   var srcHeight = 1495;
 
    var windowWidth;
    var viewPortCenterX;var viewPortCenterY;
@@ -25,11 +27,13 @@ var checkview; // DEBUG
 // ========================================================================= //
    $(document).ready(function(){
 // ------------------------------------------------------------------------- //
+/*
    windowWidth = $(window).width();                    // INIT
    viewPortCenterX = ($(window).width()/100*80) / 2;   // INIT
    viewPortCenterY = ($(window).height()/100*90) / 2;  // INIT
    svgScale    = $('div#svg').width() / svgWidth;      // INIT
    saveLayerVisibility();                              // INIT
+*/
 // ------------------------------------------------------------------------- //
    sArea = $('#viewport')
            .imgAreaSelect({handles:true,
@@ -82,7 +86,6 @@ var checkview; // DEBUG
                {currentView:currentView,
                 currentLayers:currentLayers},
                "POST","_self");
-
    });
    //$("#switchversion").mouseup(function(event){$(this).blur()});
 // ------------------------------------------------------------------------- //
@@ -345,45 +348,40 @@ var checkview; // DEBUG
       viewPanX = Math.round(panZoom.getTransform().x);
       viewPanY = Math.round(panZoom.getTransform().y);
 
+      srcViewScale = (srcWidth * svgScale / windowWidth) * viewZoom;
+
       srcViewCenterX = Math.round((viewPanX / svgScale / viewZoom - zeroX) 
                        - (viewPortCenterX / svgScale / viewZoom)) * -1;
       srcViewCenterY = Math.round((viewPanY / svgScale / viewZoom - zeroY) 
                        - (viewPortCenterY / svgScale / viewZoom)) * -1;
 
-      thisView = viewZoom + ":" + srcViewCenterX + ":" + srcViewCenterY;
+      thisView = srcViewScale + ":" + srcViewCenterX + ":" + srcViewCenterY;
 
       console.log("GET VIEW" +
-                  "  svgScale: " + svgScale +
                   "  viewZoom: " + viewZoom +
                   "  viewPanX: " + viewPanX +
                   "  viewPanY: " + viewPanY +
+                  "  srcViewScale: " + srcViewScale +
                   "  srcViewCenterX: " + srcViewCenterX +
                   "  srcViewCenterY: " + srcViewCenterY);
-      console.log("        " +
+/*    console.log("        " +
                   "  pzScale: " + panZoom.getTransform().scale +
                   "  panX: " + panZoom.getTransform().x +
                   "  panY: " + panZoom.getTransform().y);
-
+*/
       return thisView;
 
    }
 // ------------------------------------------------------------------------- //
    function setView(Z,X,Y,L) {
 
-      viewZoom       = Number(Z);
+      srcViewScale   = Number(Z);
       srcViewCenterX = Number(X);
       srcViewCenterY = Number(Y);
 
       toggleLayerVisibility(L);
 
-/*
-      viewPanX = Math.round(((srcViewCenterX / -1) 
-                            + (viewPortCenterX / svgScale / viewZoom)
-                            + zeroX) * svgScale * viewZoom);
-      viewPanY = Math.round(((srcViewCenterY / -1) 
-                            + (viewPortCenterY / svgScale / viewZoom)
-                            + zeroY) * svgScale * viewZoom);
-*/
+      viewZoom = srcViewScale / (srcWidth * svgScale / windowWidth);
       viewPanX = ((srcViewCenterX / -1) 
                   + (viewPortCenterX / svgScale / viewZoom)
                   + zeroX) * svgScale * viewZoom;
@@ -391,38 +389,21 @@ var checkview; // DEBUG
                   + (viewPortCenterY / svgScale / viewZoom)
                   + zeroY) * svgScale * viewZoom;
 
-//console.log(viewPanX + "," + viewPanY + "," + viewZoom);   
-/*
-      $('#svg').removeAttr("style");
-      panZoom = panzoom(document.getElementById('svg'));
-      panZoom.on('transform', function(e) {
-                  panX = panZoom.getTransform().x;
-                  panY = panZoom.getTransform().y;
-                  pzScale = panZoom.getTransform().scale;
-      });
-      panZoom.pause();
-
-      panZoom.zoomAbs(viewPanX,viewPanY,viewZoom);   
-*/
-
       panZoom.zoomAbs(0,0,viewZoom);   
       panZoom.moveTo(viewPanX,viewPanY);
 
-
-
-
       console.log("SET VIEW" +
-                  "  svgScale: " + svgScale +
                   "  viewZoom: " + viewZoom +
                   "  viewPanX: " + viewPanX +
                   "  viewPanY: " + viewPanY +
+                  "  srcViewScale: " + srcViewScale +
                   "  srcViewCenterX: " + srcViewCenterX +
                   "  srcViewCenterY: " + srcViewCenterY);
-      console.log("        " +
+/*    console.log("        " +
                   "  pzScale: " + panZoom.getTransform().scale +
                   "  panX: " + panZoom.getTransform().x +
                   "  panY: " + panZoom.getTransform().y);
-
+*/
 
    }
 // ------------------------------------------------------------------------- //   
