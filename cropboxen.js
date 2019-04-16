@@ -376,6 +376,7 @@
 
       panZoom.zoomAbs(0,0,viewZoom);   
       panZoom.moveTo(viewPanX,viewPanY);
+      saveLayerVisibility();
 
    }
 // ------------------------------------------------------------------------- //   
