@@ -162,7 +162,7 @@
        foreach (glob($srcPath."/*.txt") as $version) {
 
                 $fiD       = rtrim(substr($version,-16,12));// TODO: BETTER
-                $showDate  = "21.2.2019 10:30";
+                $showDate  = humanTime($fiD);
                 $versions[$fiD] = $showDate;
        }
 
@@ -301,9 +301,19 @@
       }
      }
   // -------------------------------------------------------------------- //
-     function humanTime($timestamp) {  
+     function humanTime($time) {  
+ 
+     // date +%y%m%d%H%M%S
+        $y = '20' . substr($time,0,2);
+        $m = substr($time,2,2);
+        $d = substr($time,4,2);
+        $H = substr($time,6,2);
+        $M = substr($time,8,2);
+        $S = substr($time,10,2);
 
+        $humantime = $d.'.'.$m.'.'.$y.' '.'('.$H.':'.$M.':'.$S.')';
 
+        return $humantime;
      }
   // -------------------------------------------------------------------- //
      function getValue($array,$index,$continue = 'NOT REQUIRED') {
