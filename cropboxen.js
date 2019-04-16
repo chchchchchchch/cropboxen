@@ -380,9 +380,69 @@
 
    }
 // ------------------------------------------------------------------------- //   
-   function saveView() { // TODO
+   function saveView() {
 
-    console.log(getView());
+     thisView = getView();
+     Z = thisView.split(':')[0];
+     X = thisView.split(':')[1];
+     Y = thisView.split(':')[2];
+     iD = $.md5(Z 
+                +""+ 
+                Math.floor(X/40) 
+                +""+
+                Math.floor(Y/40)
+                +""+
+                layerVisibility).substr(0,11);
+
+     if ( savedViews[iD] == undefined ) {
+
+     thisView = String(Z+":"+X+":"+Y+":"+layerVisibility).split(':');
+     savedViews[iD] = thisView;
+
+     $.ajax({
+        url: "?do=w",
+        data: {id:iD,
+               flag:"A",
+               z:Z,x:X,y:Y,
+               viD:viD,srcID:srcID,
+               layers:layerVisibility},
+        datatype: "text",
+        type: "POST",
+     });
+
+     } //else { console.log("VIEW ALREADY SAVED"); }
+
+   }
+// ------------------------------------------------------------------------- //   
+   function rmView() {
+
+     thisView = getView();
+     Z = thisView.split(':')[0];
+     X = thisView.split(':')[1];
+     Y = thisView.split(':')[2];
+     iD = $.md5(Z 
+                +""+ 
+                Math.floor(X/40) 
+                +""+
+                Math.floor(Y/40)
+                +""+
+                layerVisibility).substr(0,11);
+
+     if ( savedViews[iD] != undefined ) {
+
+          delete savedViews[iD];
+          $.ajax({
+             url: "?do=w",
+             data: {id:iD,
+                    flag:"D",
+                    z:Z,x:X,y:Y,
+                    viD:viD,srcID:srcID,
+                    layers:layerVisibility},
+             datatype: "text",
+             type: "POST",
+          });
+
+     } //else { console.log("THIS IS NOT A SAVED VIEW"); }
 
    }
 // ------------------------------------------------------------------------- //
@@ -415,10 +475,9 @@
        return [left,top];
    }
 // ------------------------------------------------------------------------- //
-   function rndItem(object) { 
-
-          keys = Object.keys(object);
-          return object[keys[Math.floor(keys.length * Math.random())]];
+   function rndItem(object) {
+            keys = Object.keys(object);
+            return object[keys[Math.floor(keys.length * Math.random())]];
    };
 // ------------------------------------------------------------------------- //
 // ========================================================================= //
@@ -438,8 +497,9 @@
 // ------------------------------------------------------------------------- //
      window.addEventListener("keydown", function(e) {
       // console.log(e.keyCode);
-      // space and arrow keys and return and tab and s and l
-      if([32,37,38,39,40,13,9,83,76].indexOf(e.keyCode) > -1) {
+      // space and arrow keys and return
+      // and tab and s and l and d
+      if([32,37,38,39,40,13,9,83,76,68].indexOf(e.keyCode) > -1) {
           e.preventDefault();
       }
      }, false); 
@@ -448,9 +508,7 @@
 
        keyCode = e.keyCode || e.which;
 
-       if ( keyCode == 83) { saveView(); }
        if ( keyCode == 76) {
-
         if ( Object.keys(savedViews).length != 0 ) {
 
               Z = rndItem(savedViews)[0];
@@ -461,6 +519,8 @@
               setView(Z,X,Y,L);
         }
        }
+       if ( keyCode == 68) { rmView(); }
+       if ( keyCode == 83) { saveView(); }
        if ( keyCode == 9 && editMode != true ) {
 
             editMode = true;

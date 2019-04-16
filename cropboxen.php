@@ -15,11 +15,13 @@
 // ------------------------------------------------------------------------- //
    if ( isset($_POST['unset']) ) { session_unset();exit(); }
 // ------------------------------------------------------------------------- // 
-// SAVE CROPBOX                                                              // 
+// DO WRITE                                                                  // 
 // ------------------------------------------------------------------------- //
    if ( isset( $_GET['do']) &&
         $_GET['do'] == "w" ) {
-
+    // -------------------------------------------------------------------
+   // SAVE CROPBOX
+  // -------------------------------------------------------------------- //
      if ( isset($_POST['id']) &&
           isset($_POST['viD']) &&
           isset($_POST['area']) &&
@@ -28,7 +30,7 @@
           count($_POST) == 5 ) {
 
           $id    = strip_tags(trim($_POST['id']));
-          $viD   = strip_tags(trim($_POST['viD'] ));
+          $viD   = strip_tags(trim($_POST['viD']));
           $flag  = strip_tags(trim($_POST['flag']));
           $area  = strip_tags(trim($_POST['area']));
           $srcID = strip_tags(trim($_POST['srcID']));
@@ -45,10 +47,10 @@
                preg_replace('/[0-9a-f]/','',$viD)  == ""  &&
                preg_replace('/[0-9a-f]/','',$srcID) == "" ){
 
-          $vBasePath = $srcBasePath . "/" . $srcID . "/" .$viD;
+           $vBasePath = $srcBasePath . "/" . $srcID . "/" .$viD;
 
-          if ( file_exists($vBasePath . ".txt")) {
-           $file = $vBasePath . ".bxn";
+           if ( file_exists($vBasePath . ".txt")) {
+                $file = $vBasePath . ".bxn";
 
             if ( file_exists($file) && is_writeable($file) ) {
                  $timestamp = round(microtime(true) * 1000);
@@ -62,11 +64,70 @@
                  // Close the text file
                  fclose($f);
             }
-
+           }
           }
+       }
+    // -------------------------------------------------------------------
+   // SAVE VIEW
+  // -------------------------------------------------------------------- //
+     if ( isset($_POST['x']) &&
+          isset($_POST['y'])  &&
+          isset($_POST['z'])   &&
+          isset($_POST['id'])   &&
+          isset($_POST['viD'])   &&
+          isset($_POST['flag'])   &&
+          isset($_POST['srcID'])   &&
+          isset($_POST['layers'])   &&
+          count($_POST) == 8 ) {
 
-        }
-      }
+          $x      = strip_tags(trim($_POST['x']));
+          $y      = strip_tags(trim($_POST['y']));
+          $z      = strip_tags(trim($_POST['z']));
+          $id     = strip_tags(trim($_POST['id']));
+          $viD    = strip_tags(trim($_POST['viD']));
+          $flag   = strip_tags(trim($_POST['flag']));
+          $srcID  = strip_tags(trim($_POST['srcID']));
+          $layers = strip_tags(trim($_POST['layers']));
+
+          $checkid = substr(md5($z.floor($x/40).floor($y/40).$layers),0,11);
+
+          if ( $flag == "A" || $flag == "D"         &&
+               strlen($id) == 11 && $id == $checkid  &&
+               preg_replace('/[0-9-]/','',$x)  == ""  &&
+               preg_replace('/[0-9-]/','',$y)   == ""  &&
+               preg_replace('/[0-9\.-]/','',$z)  == ""  &&
+               preg_replace('/[0-9a-f]/','',$id)  == ""  &&
+               preg_replace('/[0-9a-f]/','',$viD)  == ""  &&
+               preg_replace('/[0-9a-f]/','',$srcID) == "" ){
+
+          $vBasePath = $srcBasePath . "/" . $srcID . "/" .$viD;
+
+           if ( file_exists($vBasePath . ".txt")) {
+                $file = $vBasePath . ".views";
+
+            if ( file_exists($file) && is_writeable($file) ) {
+                 $timestamp = round(microtime(true) * 1000);
+                 if ( $flag == "A" ) {
+                       $write = $flag.":".
+                                $timestamp.":".
+                                $id.":".
+                                $z.":".
+                                $x.":".
+                                $y.":".
+                                $layers;
+
+                 } else if ( $flag == "D" ) {
+                              $write = $flag.":".$timestamp.":".$id; 
+                 }
+                 $f = fopen($file, "a"); // APPEND
+                 fwrite($f,$write."\n");
+                 // Close the text file
+                 fclose($f);
+            }
+           }
+          }
+       }
+    // -------------------------------------------------------------------
      exit;
    } 
 // ------------------------------------------------------------------------- // 
@@ -263,7 +324,9 @@
                   if ( $flag != '#' ) {
                        $date = rtrim(substr($line,2,13));
                        $hash = rtrim(substr($line,16,11));
+                       if ( $flag == 'A' ) {
                        $rest = rtrim(substr($line,28));
+                       } else { $rest = "::::"; }
                        $zoom = explode(':',$rest)[0];
                        $panx = explode(':',$rest)[1];
                        $pany = explode(':',$rest)[2];
