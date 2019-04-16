@@ -175,19 +175,19 @@
       foreach ( glob($vBasePath . "*.svg") as $layerFile ) {
 
                 $liD = rtrim(substr($layerFile,-10,6));
-              //$layerName = $conf[$liD];
                 $layerName = getValue($conf,$liD,'LAYER NAME MISSING');
                 $visibility = rtrim(substr($layerFile,-12,1));
                 $zIndex = substr($count,-4);
-                $layers[$count] = array('liD'        => $liD,
+                $layers[$count] = array('zindex'     => $zIndex,                                        
                                         'layerfile'  => $layerFile,
                                         'layername'  => $layerName,
-                                        'zindex'     => $zIndex,                                        
-                                        'visibility' => $visibility);
+                                        'visibility' => $visibility,
+                                        'liD'        => $liD.$zIndex);
                 $count++;
       }
 
       return $layers;
+
      }
   // -------------------------------------------------------------------- //
      function loadConfig($vBasePath) {
