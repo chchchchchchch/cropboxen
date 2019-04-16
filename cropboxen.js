@@ -510,13 +510,10 @@
 
        if ( keyCode == 76) {
         if ( Object.keys(savedViews).length != 0 ) {
-
-              Z = rndItem(savedViews)[0];
-              X = rndItem(savedViews)[1];
-              Y = rndItem(savedViews)[2];
-              L = rndItem(savedViews)[3];
-
-              setView(Z,X,Y,L);
+             randomView = rndItem(savedViews);
+             Z = randomView[0];X = randomView[1];
+             Y = randomView[2];L = randomView[3];
+             setView(Z,X,Y,L);
         }
        }
        if ( keyCode == 68) { rmView(); }
