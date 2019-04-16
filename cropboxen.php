@@ -471,14 +471,19 @@
 
            $currentView = $_SESSION[$srcID.'View'];
            $currentLayers = $_SESSION[$srcID.'Layers'];
-
-         //echo 'console.log("'. $currentView . '");' . "\n";
-         //echo 'console.log("'. $currentLayers . '");' . "\n";
-
            echo "\n" . ' $(document).ready(function(){' .
                        'setView(' . preg_replace('/:/',',',$currentView) 
                                   . ',"' . $currentLayers . '");});' . "\n\n";
-       } ?>
+       } else { ?>
+  $(document).ready(function(){
+    if ( Object.keys(savedViews).length != 0 ) {
+         randomView=rndItem(savedViews);
+         Z=randomView[0];X=randomView[1];
+         Y=randomView[2];L=randomView[3];
+         setView(Z,X,Y,L);
+    }
+  });
+<?php  } ?>
  </script><script src="cropboxen.js"></script>
 </head>
 <body style="background-color:<?php echo $bgColor; ?>;">
