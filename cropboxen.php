@@ -143,7 +143,7 @@
      echo "NO SOURCE BUT VERSION SET. ";
      $viD = strip_tags(trim($_GET['v']));
      $allViD  = array_filter(glob($srcBasePath."/*/*.txt"));
-     $viDMatch  = array_values(preg_grep('/'.$viD.'/i',$allViD))[0];
+     $viDMatch  = array_values(preg_grep('/'.$viD.'/',$allViD))[0];
 
      $srcID = substr($viDMatch,2,6);
    //------
