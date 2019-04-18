@@ -2,7 +2,6 @@
 
   INPUT="$1"
   OUTDIR="_";OUTDIR=`realpath $OUTDIR`
-  URLPATTERN="cropboxen.php?show=%FILEID%\&v=%VERSION%"
 # --------------------------------------------------------------------------- #
   TMPDIR="/tmp";TMP="$TMPDIR/tmp"
 # --------------------------------------------------------------------------- #
@@ -44,14 +43,6 @@
 
   cd $GITROOTPATH # CHANGE INTO GIT ROOT PATH
 # =========================================================================== #
-# CREATE TREE VIEW (TO BE MODIFIED)
-# =========================================================================== #
-  TREEID=`echo $GITREMOTEBASEURLONE | #
-          md5sum | cut -c 1-6``echo $GITSUBPATH | #
-                               md5sum | cut -c 1-4`
-  tree --charset=ascii -f -P "*.svg" --prune $GITSUBPATH | #
-  sed 's/`--/|--/g'                                             > ${TMP}.tree
-# =========================================================================== #
 # LIST ALL FILES AND WRITE TO TEMPORARY LIST
 # =========================================================================== #
   for BRANCH in `git for-each-ref --format='%(refname)' refs/heads/`
@@ -83,14 +74,6 @@
           MESSAGE=`echo $COMMIT | cut -d ":" -f 3-`
           SVGID="$TIMESTAMP"
           SVGINFO="$SVGDIR/${SVGID}.txt"
-        # ------------------------------------------------------------ #
-          CNT=`echo 00$CNT | rev | cut -c 1-2 | rev`
-          AHREF=`echo $URLPATTERN          | #
-                 sed "s,%FILEID%,$FILEID," | #
-                 sed "s,%VERSION%,$SVGID," | #
-                 sed 's,^,[<a href=",'     | #
-                 sed "s,$,\">$CNT</a>],"`    #
-          sed -i "\,$SVG,s,$, $AHREF," ${TMP}.tree
         # ------------------------------------------------------------ #
           TMPSVG="${TMP}.${TIMESTAMP}.svg"
         # ------------------------------------------------------------ #
@@ -180,47 +163,12 @@
   # ----------------------------------------------------------------------- #
   # TODO: IF NOT TRACKED
   done
-# --------------------------------------------------------------------------- #
+# =========================================================================== #
   cd - > /dev/null
 
-# =========================================================================== #
-# FORMAT TREE VIEW
-# =========================================================================== #
-  GITSUBPATH=`echo $GITSUBPATH | sed 's,/$,,'`
-  CHARGSP=`echo -n $GITSUBPATH | wc -c`
-  if [ $CHARGSP == 0 ];then CHARGSP=2;fi
-  TREEINDENT=`printf " %.0s" {1..100} | cut -c 2-$CHARGSP`
-  sed -i "s/^/$TREEINDENT/"   ${TMP}.tree
-  sed -i "1s,.*,$GITSUBPATH," ${TMP}.tree
 # --------------------------------------------------------------------------- #
-  CHARMAX=`cat ${TMP}.tree | #
-           sed 's/\[[^]]*\]/XXXX/g' | #
-           wc -L`;CHARMAX=`expr $CHARMAX + 10`
-  HL=`printf -- "-%.0s" {1..200} | cut -c 3-$CHARMAX`
-# --------------------------------------------------------------------------- #
-  sed -i 's,-- ./,-- ,'                       ${TMP}.tree
-  sed -i '/\.svg$/d'                          ${TMP}.tree
-  sed -i '\,\.svg ,!s,\(|-- \)\(.*/\),\1,'    ${TMP}.tree
-# --------------------------------------------------------------------------- #
- (IFS=$'\n';
-  for L in `cat ${TMP}.tree`
-   do CHARNUM=`echo "$L" | sed 's/\[[^]]*\]/XXXX/g' | wc -c`
-      CHARPAD=`expr $CHARMAX - $CHARNUM`
-      TREEPAD=`printf " %.0s" {1..100} | cut -c 1-$CHARPAD`
-      echo $L | sed "s/\(\.svg\)\( \)\(\[\)/\1$TREEPAD\3/" >> ${TMP}.tree.mod
-   done;) 
-# --------------------------------------------------------------------------- #
-  TREEHREF="$GITREMOTEBASEURLONE/tree/master/$GITSUBPATH"
-  TREEHEAD="$GITREMOTEBASEURLONE"
-  sed -i "1s,.*,$HL\n$TREEHEAD\n$HL\n&,"       ${TMP}.tree.mod
-  sed -i '1s,.*,<html><body><pre>\n&,'         ${TMP}.tree.mod
-  sed -i "\$s,.*,$HL\n</pre></body></html>,"   ${TMP}.tree.mod
-# --------------------------------------------------------------------------- #
-  mv ${TMP}.tree.mod ${OUTDIR}/${TREEID}.tree
-
-# =========================================================================== #
 # CLEAN UP
-# =========================================================================== #
+# --------------------------------------------------------------------------- #
   rm ${TMP}.list
 # --------------------------------------------------------------------------- #
 
