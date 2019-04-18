@@ -1,7 +1,5 @@
 #!/bin/bash
 
- #GITDIR="$1";GITDIR=`realpath $GITDIR`
-
   INPUT="$1"
   OUTDIR="_";OUTDIR=`realpath $OUTDIR`
   URLPATTERN="cropboxen.php?show=%FILEID%\&v=%VERSION%"
@@ -71,8 +69,8 @@
       FILEID=`echo $GITREMOTEBASEURLONE$SVG | #
               md5sum | cut -c 1-6`            #
       SVGNAME=`basename $SVG`
-      SVGDIR="$OUTDIR/$MAINID"
-#     if [ ! -d $SVGDIR ];then mkdir $SVGDIR;fi
+      SVGDIR="$OUTDIR/$FILEID"
+      if [ ! -d $SVGDIR ];then mkdir $SVGDIR;fi
   # ----------------------------------------------------------------------- #
      (IFS=$'\n';CNT=1
   # ----------------------------------------------------------------------- #
@@ -94,81 +92,87 @@
                  sed "s,$,\">$CNT</a>],"`    #
           sed -i "\,$SVG,s,$, $AHREF," ${TMP}.tree
         # ------------------------------------------------------------ #
-#         TMPSVG="${TMP}.${TIMESTAMP}.svg"
+          TMPSVG="${TMP}.${TIMESTAMP}.svg"
         # ------------------------------------------------------------ #
           GITURLS=`getGitRawUrl -a $GITREMOTEBASEURLS $HASH $SVG | #
                    sed 's/^/GITURL:/'`
-#       # ------------------------------------------------------------ #
-#         git show ${HASH}:${SVG} > $TMPSVG
-#       # ------------------------------------------------------------ #
-#         cat $TMPSVG | sed 's/display:none//g' > ${TMP}.svg
-#         inkscape --export-area-drawing \
-#                  --export-png=${TMP}.png \
-#                 ${TMP}.svg > /dev/null 2>&1
-#         VHASH=`md5sum ${TMP}.png | cut -d " " -f 1`
-#       # ============================================================ #
-#         if [ "$VHASH" != "$PREVVHASH" ]
-#         then
-#       # ------------------------------------------------------------ #
-#         echo $GITURLS | sed 's/ /\n/g'                   >  $SVGINFO
-#       # ------------------------------------------------------------ #
-#         echo "COMMITMESSAGE:$MESSAGE"                    >> $SVGINFO
-#       # ------------------------------------------------------------ #
-#         echo "# STATUS:TIMESTAMP:ID:X:Y:W:H"  > $SVGDIR/${SVGID}.bxn
-#       # ------------------------------------------------------------ #
-#         AREA=`svgGetDimensions $TMPSVG`
-#         MAX=`echo $AREA | cut -d ":" -f 3,4 | #
-#              sed 's/:/\n/' | sort -n | tail -n 1`
-#         MARGIN=`python -c "print $MAX / 100 * 10" | cut -d "." -f 1`
-#         C=1;AREAPLUS=""
-#         for V in `echo $AREA | sed 's/:/\n/g'`
-#          do   if [ "$C" -le 2 ]
-#               then V=`expr $V - $MARGIN / 2`
-#               else V=`expr $V + $MARGIN`
-#               fi
-#               C=`expr $C + 1`
-#               AREAPLUS="${AREAPLUS}:$V"
-#         done; AREAPLUS=`echo $AREAPLUS | sed 's/^://'`
-#         AREA="$AREAPLUS"
-#         echo "AREA:$AREA"                                >> $SVGINFO
-#       # ------------------------------------------------------------ #
-#         sed 's/pagecolor="[^"]*"/\n&\n/' $TMPSVG | #
-#         grep "^pagecolor" | cut -d '"' -f 2 | head -n 1 | #
-#         sed 's/^/BGCOLOR:/' >> $SVGINFO
-#       # ------------------------------------------------------------ #
-#         svgLayers2Files $TMPSVG $SVGDIR/$SVGID
-#       # ------------------------------------------------------------ #
-#         for SVGLAYER in `ls $SVGDIR/${SVGID}*.svg`
-#          do #echo $SVGLAYER
-#             LAYERNAME=`cat $SVGLAYER | #
-#                        sed 's/inkscape:label="[^"]*"/\n&\n/' | #
-#                        grep "^inkscape:label" | cut -d '"' -f 2 | #
-#                        head -n 1`
-#             LAYERNAMEID=`echo $SVGLAYER | rev | #
-#                          cut -d "_" -f 1 | rev | #
-#                          sed 's/\.svg$//'`       #
-#             echo "$LAYERNAMEID:$LAYERNAME" >> $SVGINFO
-#             svgCropArea $SVGLAYER ${SVGLAYER%%.*}_CROP.svg $AREA
-#             svgBake ${SVGLAYER%%.*}_CROP.svg $SVGLAYER
-#             rm ${SVGLAYER%%.*}_CROP.svg
-#         done
-#       # ------------------------------------------------------------ #
-#         sed 's/viewBox="[^"]*"/\n&\n/' $SVGDIR/${SVGID}*.svg | #
-#         grep "^viewBox" | head -n 1 | #
-#         cut -d '"' -f 2 | cut -d " " -f 3 | #
-#         sed 's/^/W:/' >> $SVGINFO
-#       # ----
-#         sed 's/viewBox="[^"]*"/\n&\n/' $SVGDIR/${SVGID}*.svg | #
-#         grep "^viewBox" | head -n 1 | #
-#         cut -d '"' -f 2 | cut -d " " -f 4 | #
-#         sed 's/^/H:/' >> $SVGINFO
-#       # ------------------------------------------------------------ #
-#       # ============================================================ #
-#         else echo "NO VISUAL CHANGES"
-#              rm ${TMPSVG}
-#         fi
-#         PREVVHASH="$VHASH"
-#       # ============================================================ #
+        # ------------------------------------------------------------ #
+          git show ${HASH}:${SVG} > $TMPSVG
+        # ------------------------------------------------------------ #
+          cat $TMPSVG | sed 's/display:none//g' > ${TMP}.svg
+          inkscape --export-area-drawing \
+                   --export-png=${TMP}.png \
+                  ${TMP}.svg > /dev/null 2>&1
+          VHASH=`md5sum ${TMP}.png | cut -d " " -f 1`
+        # ============================================================ #
+          if [ "$VHASH" != "$PREVVHASH" ]
+          then
+        # ------------------------------------------------------------ #
+          echo $GITURLS | sed 's/ /\n/g'                   >  $SVGINFO
+        # ------------------------------------------------------------ #
+          echo "COMMITMESSAGE:$MESSAGE"                    >> $SVGINFO
+        # ------------------------------------------------------------ #
+          sed "s/width=\"[^\"]*\"/\n&/" $TMPSVG | grep "^width=" | #
+          head -n 1 | cut -d '"' -f 2 | sed 's/^/SRCW:/'   >> $SVGINFO
+          sed "s/height=\"[^\"]*\"/\n&/" $TMPSVG | grep "^height=" | #
+          head -n 1 | cut -d '"' -f 2 | sed 's/^/SRCH:/'   >> $SVGINFO
+        # ------------------------------------------------------------ #
+          echo "# STATUS:TIMESTAMP:ID:X:Y:W:H" > $SVGDIR/${SVGID}.bxn
+          echo "# STATUS:TIMESTAMP:ID:Z:X:Y:L" > $SVGDIR/${SVGID}.views 
+        # ------------------------------------------------------------ #
+          AREA=`svgGetDimensions $TMPSVG`
+          MAX=`echo $AREA | cut -d ":" -f 3,4 | #
+               sed 's/:/\n/' | sort -n | tail -n 1`
+          MARGIN=`python -c "print $MAX / 100 * 10" | cut -d "." -f 1`
+          C=1;AREAPLUS=""
+          for V in `echo $AREA | sed 's/:/\n/g'`
+           do   if [ "$C" -le 2 ]
+                then V=`expr $V - $MARGIN / 2`
+                else V=`expr $V + $MARGIN`
+                fi
+                C=`expr $C + 1`
+                AREAPLUS="${AREAPLUS}:$V"
+          done; AREAPLUS=`echo $AREAPLUS | sed 's/^://'`
+          AREA="$AREAPLUS"
+          echo "AREA:$AREA"                                >> $SVGINFO
+        # ------------------------------------------------------------ #
+          sed 's/pagecolor="[^"]*"/\n&\n/' $TMPSVG | #
+          grep "^pagecolor" | cut -d '"' -f 2 | head -n 1 | #
+          sed 's/^/BGCOLOR:/' >> $SVGINFO
+        # ------------------------------------------------------------ #
+          svgLayers2Files $TMPSVG $SVGDIR/$SVGID
+        # ------------------------------------------------------------ #
+          for SVGLAYER in `ls $SVGDIR/${SVGID}*.svg`
+           do #echo $SVGLAYER
+              LAYERNAME=`cat $SVGLAYER | #
+                         sed 's/inkscape:label="[^"]*"/\n&\n/' | #
+                         grep "^inkscape:label" | cut -d '"' -f 2 | #
+                         head -n 1`
+              LAYERNAMEID=`echo $SVGLAYER | rev | #
+                           cut -d "_" -f 1 | rev | #
+                           sed 's/\.svg$//'`       #
+              echo "$LAYERNAMEID:$LAYERNAME" >> $SVGINFO
+              svgCropArea $SVGLAYER ${SVGLAYER%%.*}_CROP.svg $AREA
+              svgBake ${SVGLAYER%%.*}_CROP.svg $SVGLAYER
+              rm ${SVGLAYER%%.*}_CROP.svg
+          done
+        # ------------------------------------------------------------ #
+          sed 's/viewBox="[^"]*"/\n&\n/' $SVGDIR/${SVGID}*.svg | #
+          grep "^viewBox" | head -n 1 | #
+          cut -d '"' -f 2 | cut -d " " -f 3 | #
+          sed 's/^/W:/' >> $SVGINFO
+        # ----
+          sed 's/viewBox="[^"]*"/\n&\n/' $SVGDIR/${SVGID}*.svg | #
+          grep "^viewBox" | head -n 1 | #
+          cut -d '"' -f 2 | cut -d " " -f 4 | #
+          sed 's/^/H:/' >> $SVGINFO
+        # ------------------------------------------------------------ #
+        # ============================================================ #
+          else echo "NO VISUAL CHANGES"
+               rm ${TMPSVG}
+          fi
+          PREVVHASH="$VHASH"
+        # ============================================================ #
           CNT=`expr $CNT + 1`
       done;)
   # ----------------------------------------------------------------------- #
@@ -221,3 +225,4 @@
 # --------------------------------------------------------------------------- #
 
 exit 0;
+
