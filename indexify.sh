@@ -2,7 +2,7 @@
 
   SRCPATH="_"
   TMPDIR="/tmp";TMP="$TMPDIR/tmp"
-  if [ -f "${TMP}.tree" ];then rm ${TMP}.tree;fi
+
 # --------------------------------------------------------------------------- #
   # https://askubuntu.com/questions/962170
   walk() { local INDENT="${2:-0}"
@@ -39,19 +39,22 @@
        sed "s,^\.txt:GITURL:${REPO}raw/[0-9a-f]*/,,"     | #
        sort -t' ' -k 1,1 | #
        cut -d " " -f 1 > ${TMP}.items
- 
+
+       if [ -f "${TMP}.tree" ];then rm ${TMP}.tree;fi
+
        for THIS in `cat ${TMP}.items | #
                     cut -d "/" -f 1  | #
                     sort -u`
         do
             walk $THIS >> ${TMP}.tree
        done
+
+       cat ${TMP}.tree  | #
+       sed '1s/^.*$/<ul>\n<li>&/'                | #
+       sed 's/\(^[ ]*\)\(<li>\)\([ ]*\)/\1\2/' | #
+       sed '$s/^<\/li>$/&\n<\/ul>\n\n/'
  
   done
-
-  cat ${TMP}.tree | sed '1s/^\.$//'       | #
-  sed 's/\(^[ ]*\)\(<li>\)\([ ]*\)/\1\2/' | #
-  sed '$s/^<\/li>$//'
 # --------------------------------------------------------------------------- #
 
 
