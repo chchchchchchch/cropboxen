@@ -37,6 +37,7 @@
                grep "^GITURL" | cut -d ":" -f 2-       | #
                sort -u`
    do
+       REPOID=`echo $REPO | md5sum | cut -c 1-8`
     #  ----
        grep -m 1 -h "^GITURL:$REPO" $SRCPATH/*/*.txt | #
        cut -d ":" -f 2- | sed "s,^${REPO}raw/[0-9a-f]*/,," > ${TMP}.list
@@ -60,10 +61,6 @@
         do walk $THIS >> ${TMP}.tree
        done
     #  ----
-       sed -i '1s/^.*$/<ul>\n<li>&/'              ${TMP}.tree
-       sed -i 's/\(^[ ]*\)\(<li>\)\([ ]*\)/\1\2/' ${TMP}.tree
-       sed -i '$s/^<\/li>$/&\n<\/ul>\n\n/'        ${TMP}.tree
-    #  ----
        grep -m 1 "^GITURL:$REPO" $SRCPATH/*/*.txt        | #
        sed "s,^$SRCPATH/\([0-9a-f]\{6\}\)/\(.*\),\2:\1," | #
        sed "s,\([0-9]\{12\}\)\(.*\),\2:\1,"              | #
@@ -82,14 +79,19 @@
                URL=`echo $URLPATTERN       | #
                     sed "s,%SRCID%,$SID,"  | #
                     sed "s,%VERSION%,$VID,"` #
-               HREF="$HREF <a href=\"$URL\">[$CNT]<\/a>"
+               HREF="$HREF<a href=\"$URL\">[$CNT]<\/a>"
                CNT=`expr $CNT + 1`
            done
-           HREF="$NAME $HREF"
+           HREF="<span><a href=\"$URL\">$NAME</a></span><span>$HREF</span>"
            sed -i "s,${FID}\.item,$HREF," ${TMP}.tree
        done
     #  ---- 
-       cat ${TMP}.tree
+       UL="<ul id=\"$REPOID\" class=\"tree\">"
+       echo "<h1 class=\"tree\">$REPO</h1>"      >  ${SRCPATH}/${REPOID}.tree
+       sed "1s/^.*$/$UL\n<li>&/" ${TMP}.tree   | #
+       sed 's/\(^[ ]*\)\(<li>\)\([ ]*\)/\1\2/' | #
+       sed '$s/^<\/li>$/&\n<\/ul>\n\n/'          >> ${SRCPATH}/${REPOID}.tree
+       sed -i '/^[ ]*$/d'                           ${SRCPATH}/${REPOID}.tree
   done
 # --------------------------------------------------------------------------- #
   if [ `echo ${TMP} | wc -c` -ge 4 ] &&
