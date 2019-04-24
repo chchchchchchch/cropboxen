@@ -132,6 +132,48 @@
    } 
 // ------------------------------------------------------------------------- // 
 // DISPLAY/EDIT                                                              // 
+// ------------------------------------------------------------------------- //
+   if ( count($_GET) == 0 ) {
+?>
+<html><head>
+ <script src="lib/js/jquery-3.3.1.js"></script>
+ <script src="lib/js/jsLists.js"></script>
+ <link rel="stylesheet" href="lib/css/jsLists.css"/>
+ <link rel="stylesheet" href="lib/css/tree.css"/>
+</head><body>
+<?php  foreach (glob($srcBasePath."/*.tree") as $tree) {
+                $treeid = substr($tree,2,8);
+                echo "\n";
+                echo file_get_contents($tree);
+       echo '<script>JSLists.createTree("'.$treeid.'");</script>'."\n\n";
+
+       }
+?>
+<script>
+ $('h1.tree').click(function() {
+  if ( !$(this).hasClass('open') ) {
+   $('#'+$(this).next().attr('id')+' .jsl-list-closed').each(function() {
+      $(this).addClass('jsl-list-open');});
+   $('#'+ $(this).next().attr('id')+' .jsl-collapsed').each(function() {
+      $(this).addClass('jsl-open');});
+   $(this).addClass('open'); 
+   //$('#'+ $(this).next().attr('id')).css({'visibility':'visible'})
+   $('#'+ $(this).next().attr('id')).addClass('open');
+  } else {
+   $('#'+ $(this).next().attr('id')+' .jsl-list-closed').each(function() {
+      $(this).removeClass('jsl-list-open');});
+   $('#'+ $(this).next().attr('id')+' .jsl-collapsed').each(function() {
+      $(this).removeClass('jsl-open');});
+   $(this).removeClass('open'); 
+   //$('#'+ $(this).next().attr('id')).css({'visibility':'hidden'});
+   $('#'+ $(this).next().attr('id')).removeClass('open');
+  }
+ });
+</script>
+</body>
+</html>
+<?php exit;
+   }
 // ------------------------------------------------------------------------- // 
    if ( isset($_GET['show']) ) {
 
